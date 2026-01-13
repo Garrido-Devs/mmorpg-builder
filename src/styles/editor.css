@@ -184,7 +184,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   font-size: 12px;
   font-weight: 600;
   color: var(--editor-text-primary);
@@ -208,16 +207,18 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .editor-topbar-user-dot {
   position: absolute;
-  bottom: -2px;
-  right: -2px;
-  width: 10px;
-  height: 10px;
+  bottom: -1px;
+  right: -1px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   border: 2px solid var(--editor-bg-secondary);
+  z-index: 2;
 }
 
 .editor-topbar-user-dot-offline {
