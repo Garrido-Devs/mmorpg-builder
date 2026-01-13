@@ -69,6 +69,7 @@ export function ComponentEditor({ component, onUpdate, onRemove }: ComponentEdit
             min={prop.min}
             max={prop.max}
             step={prop.step || 1}
+            placeholder={prop.default !== undefined ? String(prop.default) : '0'}
           />
         )
 
@@ -233,6 +234,12 @@ export function ComponentEditor({ component, onUpdate, onRemove }: ComponentEdit
         className="editor-component-header"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
+        <span className="editor-component-collapse" style={{
+          transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+          transition: '150ms',
+          fontSize: '10px',
+          color: 'var(--editor-text-muted)'
+        }}>▼</span>
         <span className="editor-component-icon">{definition.icon}</span>
         <span className="editor-component-name">{definition.name}</span>
 

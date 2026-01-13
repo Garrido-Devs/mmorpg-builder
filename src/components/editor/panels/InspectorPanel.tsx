@@ -88,29 +88,36 @@ export function InspectorPanel({ selectedObject }: InspectorPanelProps) {
   const handleRemoveComponent = useCallback((componentId: string) => {
     if (!selectedObject) return
 
-    const updatedComponents = components.filter(c => c.id !== componentId)
-    setComponents(updatedComponents)
-    selectedObject.userData.components = updatedComponents
+    setComponents(prev => {
+      const updatedComponents = prev.filter(c => c.id !== componentId)
+      selectedObject.userData.components = updatedComponents
 
-    // Atualiza visualização
-    const engine = getEngine()
-    engine.updateObjectComponents(selectedObject)
-  }, [selectedObject, components])
+      // Atualiza visualização
+      const engine = getEngine()
+      engine.updateObjectComponents(selectedObject)
+
+      return updatedComponents
+    })
+  }, [selectedObject])
 
   // Atualiza um componente
   const handleUpdateComponent = useCallback((componentId: string, updates: Partial<Component>) => {
     if (!selectedObject) return
 
-    const updatedComponents = components.map(c =>
-      c.id === componentId ? { ...c, ...updates } as Component : c
-    )
-    setComponents(updatedComponents)
-    selectedObject.userData.components = updatedComponents
+    setComponents(prev => {
+      const updatedComponents = prev.map(c =>
+        c.id === componentId ? { ...c, ...updates } as Component : c
+      )
+      // Salva no userData do objeto
+      selectedObject.userData.components = updatedComponents
 
-    // Atualiza visualização
-    const engine = getEngine()
-    engine.updateObjectComponents(selectedObject)
-  }, [selectedObject, components])
+      // Atualiza visualização
+      const engine = getEngine()
+      engine.updateObjectComponents(selectedObject)
+
+      return updatedComponents
+    })
+  }, [selectedObject])
 
   // Nenhum objeto selecionado
   if (!selectedObject) {
