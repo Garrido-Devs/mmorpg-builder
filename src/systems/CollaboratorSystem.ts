@@ -84,6 +84,11 @@ export class CollaboratorSystem {
         const configureMaterial = (material: THREE.Material): THREE.MeshStandardMaterial => {
           const oldMat = material as THREE.MeshStandardMaterial
 
+          // Se a textura tem alpha, desabilita
+          if (oldMat.map) {
+            oldMat.map.premultiplyAlpha = false
+          }
+
           // Cria novo material copiando apenas propriedades visuais essenciais
           const mat = new THREE.MeshStandardMaterial({
             map: oldMat.map || null,
@@ -91,14 +96,16 @@ export class CollaboratorSystem {
             color: oldMat.color || new THREE.Color(0xffffff),
             metalness: oldMat.metalness ?? 0,
             roughness: oldMat.roughness ?? 1,
-            // Forca opacidade total
+            // Forca opacidade total - NENHUMA transparencia
             transparent: false,
             opacity: 1,
             depthWrite: true,
             depthTest: true,
             alphaTest: 0,
+            alphaMap: null, // Remove mapa de alpha
             alphaToCoverage: false,
-            side: THREE.FrontSide,
+            side: THREE.DoubleSide, // Renderiza ambos os lados
+            blending: THREE.NormalBlending,
             // Cor do usuario como emissive
             emissive: new THREE.Color(user.color),
             emissiveIntensity: 0.1,

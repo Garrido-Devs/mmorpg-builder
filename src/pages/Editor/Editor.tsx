@@ -56,14 +56,10 @@ export function Editor() {
   const saveToCloudRef = useRef(saveToCloud)
   saveToCloudRef.current = saveToCloud
 
-  // Debug: log estado de colaboração
+  // Debug: log estado de colaboração (apenas quando conexão muda)
   useEffect(() => {
-    console.log('[Editor] collaboration state:', {
-      isConnected: collaboration.isConnected,
-      projectId: collaboration.projectId,
-      activeUsers: collaboration.activeUsers?.length || 0,
-    })
-  }, [collaboration.isConnected, collaboration.projectId, collaboration.activeUsers])
+    console.log('[Editor] Colaboração:', collaboration.isConnected ? 'CONECTADO' : 'DESCONECTADO', '| Usuarios:', collaboration.activeUsers?.length || 0)
+  }, [collaboration.isConnected])
 
   // Sincroniza colaboradores com o engine 3D
   useEffect(() => {
