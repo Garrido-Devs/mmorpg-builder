@@ -74,53 +74,12 @@ export class CollaboratorSystem {
     const group = new THREE.Group()
     const model = SkeletonUtils.clone(this.modelTemplate) as THREE.Group
 
-    // Configura sombras e cor - forca material opaco
+    // Configura apenas sombras - NAO modifica materiais para teste
     model.traverse((child) => {
       if (child instanceof THREE.Mesh || child instanceof THREE.SkinnedMesh) {
         child.castShadow = true
         child.receiveShadow = true
-
-        // Funcao para configurar um material - forca opacidade total
-        const configureMaterial = (material: THREE.Material): THREE.MeshStandardMaterial => {
-          const oldMat = material as THREE.MeshStandardMaterial
-
-          // Se a textura tem alpha, desabilita
-          if (oldMat.map) {
-            oldMat.map.premultiplyAlpha = false
-          }
-
-          // Cria novo material copiando apenas propriedades visuais essenciais
-          const mat = new THREE.MeshStandardMaterial({
-            map: oldMat.map || null,
-            normalMap: oldMat.normalMap || null,
-            color: oldMat.color || new THREE.Color(0xffffff),
-            metalness: oldMat.metalness ?? 0,
-            roughness: oldMat.roughness ?? 1,
-            // Forca opacidade total - NENHUMA transparencia
-            transparent: false,
-            opacity: 1,
-            depthWrite: true,
-            depthTest: true,
-            alphaTest: 0,
-            alphaMap: null, // Remove mapa de alpha
-            alphaToCoverage: false,
-            side: THREE.DoubleSide, // Renderiza ambos os lados
-            blending: THREE.NormalBlending,
-            // Cor do usuario como emissive
-            emissive: new THREE.Color(user.color),
-            emissiveIntensity: 0.1,
-          })
-
-          mat.needsUpdate = true
-          return mat
-        }
-
-        // Trata material unico ou array de materiais
-        if (Array.isArray(child.material)) {
-          child.material = child.material.map(configureMaterial)
-        } else if (child.material) {
-          child.material = configureMaterial(child.material)
-        }
+        // Nao modifica materiais - usa o original
       }
     })
 
