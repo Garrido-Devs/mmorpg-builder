@@ -1,22 +1,19 @@
-import { Game } from './components'
-import { InteractionPrompt } from './components/InteractionPrompt'
-import { EditorLayout } from './components/editor'
-import { useGameEngine } from './hooks'
+import { Routes, Route } from 'react-router-dom'
+import { Landing } from './pages/Landing'
+import { Docs } from './pages/Docs'
+import { Assets } from './pages/Assets'
+import { Editor } from './pages/Editor'
 import './styles/index.css'
 
-/**
- * App - Componente raiz da aplicação
- *
- * Usa o EditorLayout para estruturar a interface profissional
- */
 function App() {
-  const { mode, changeMode } = useGameEngine()
-
   return (
-    <EditorLayout mode={mode} onModeChange={changeMode}>
-      <Game />
-      {mode === 'play' && <InteractionPrompt />}
-    </EditorLayout>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/docs" element={<Docs />} />
+      <Route path="/docs/:section" element={<Docs />} />
+      <Route path="/assets" element={<Assets />} />
+      <Route path="/editor" element={<Editor />} />
+    </Routes>
   )
 }
 

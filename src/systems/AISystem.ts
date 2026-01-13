@@ -490,7 +490,7 @@ export class AISystem {
   /**
    * Calcula ponto na borda da zona segura entre NPC e alvo
    */
-  private getPointOnSafeZoneBorder(npcPos: THREE.Vector3, targetPos: THREE.Vector3): THREE.Vector3 {
+  private getPointOnSafeZoneBorder(_npcPos: THREE.Vector3, targetPos: THREE.Vector3): THREE.Vector3 {
     const direction = new THREE.Vector3()
       .subVectors(targetPos, this.safeZoneCenter)
       .normalize()
