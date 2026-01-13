@@ -15,10 +15,17 @@ const thumbnailCache = new Map<string, string>()
 export function ModelThumbnail({ modelPath, size = 100, className = '' }: ModelThumbnailProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(thumbnailCache.get(modelPath) || null)
-  const [loading, setLoading] = useState(!thumbnailCache.has(modelPath))
+  const [loading, setLoading] = useState(!thumbnailCache.has(modelPath) && !!modelPath)
   const [error, setError] = useState(false)
 
   useEffect(() => {
+    // Se não tem path, mostrar fallback
+    if (!modelPath) {
+      setLoading(false)
+      setError(true)
+      return
+    }
+
     // Se já temos a imagem em cache, não precisa renderizar
     if (thumbnailCache.has(modelPath)) {
       setImageUrl(thumbnailCache.get(modelPath)!)
