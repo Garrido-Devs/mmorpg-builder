@@ -25,18 +25,28 @@ export function Editor() {
 
   // Save function - pode ser chamada imediatamente ou pelo auto-save
   const saveToCloud = useCallback(async (force = false) => {
-    if (!currentProject || (!hasChangesRef.current && !force)) return
+    console.log('[Editor] saveToCloud chamado - force:', force, 'hasChanges:', hasChangesRef.current, 'project:', currentProject?.id)
+
+    if (!currentProject) {
+      console.warn('[Editor] Nao pode salvar - projeto nao carregado')
+      return
+    }
+    if (!hasChangesRef.current && !force) {
+      console.log('[Editor] Nao pode salvar - sem mudancas')
+      return
+    }
 
     setIsSaving(true)
     try {
       const engine = getEngine()
       const mapData = engine.getMapData()
-      await updateProjectData('scene', 'main', mapData)
+      console.log('[Editor] Salvando', mapData.objects.length, 'objetos...')
+      const result = await updateProjectData('scene', 'main', mapData)
+      console.log('[Editor] Resultado do save:', result)
       setLastSaved(new Date())
       hasChangesRef.current = false
-      console.log('[Editor] Salvo no banco de dados')
     } catch (error) {
-      console.error('Auto-save failed:', error)
+      console.error('[Editor] Erro ao salvar:', error)
     } finally {
       setIsSaving(false)
     }
@@ -131,13 +141,18 @@ export function Editor() {
       type: 'add' | 'remove' | 'update'
       object: unknown
     }>) => {
+      console.log('[Editor] local-scene-change recebido:', event.detail.type)
+
       // Broadcast para colaboradores
       if (collaboration.isConnected) {
         collaboration.broadcastSceneChange(event.detail.type, event.detail.object)
       }
+
       // Salva imediatamente no banco (com debounce de 1s)
       hasChangesRef.current = true
+      console.log('[Editor] Agendando save em 1s...')
       setTimeout(() => {
+        console.log('[Editor] Executando save agendado')
         saveToCloudRef.current(true)
       }, 1000)
     }
@@ -148,15 +163,20 @@ export function Editor() {
 
   // Carrega dados da cena quando o projeto é carregado
   useEffect(() => {
+    console.log('[Editor] Verificando dados do projeto:', currentProject?.id, 'data:', currentProject?.data)
+
     if (currentProject?.data?.scene?.main) {
       const sceneData = currentProject.data.scene.main.data as { objects?: unknown[] }
+      console.log('[Editor] Scene data encontrado:', sceneData)
       if (sceneData?.objects && Array.isArray(sceneData.objects)) {
         console.log('[Editor] Carregando cena do banco:', sceneData.objects.length, 'objetos')
         const engine = getEngine()
         engine.loadMap(sceneData as Parameters<typeof engine.loadMap>[0])
       }
+    } else {
+      console.log('[Editor] Nenhum dado de cena encontrado no projeto')
     }
-  }, [currentProject?.id])
+  }, [currentProject?.id, currentProject?.data])
 
   // Auto-save timer
   useEffect(() => {
