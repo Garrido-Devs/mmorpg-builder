@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Navbar, SEO } from '@/components/shared'
+import { Navbar, SEO, ModelThumbnail } from '@/components/shared'
 import { ASSETS } from '@/assets/AssetRegistry'
 import '@/styles/landing.css'
 
@@ -124,11 +124,7 @@ export function Landing() {
         <div className="assets-grid">
           {previewAssets.map((asset) => (
             <div key={asset.id} className="asset-card">
-              <div className="asset-card-icon">
-                {asset.type === 'npc' ? '🧙' :
-                 asset.type === 'prop' ? '🪑' :
-                 asset.type === 'item' ? '⚔️' : '📦'}
-              </div>
+              <ModelThumbnail modelPath={asset.path} size={80} />
               <div className="asset-card-name">{asset.name}</div>
             </div>
           ))}

@@ -28,6 +28,41 @@
   scrollbar-color: #6366f1 #0a0a0f;
 }
 
+/* Model Thumbnails */
+.model-thumbnail {
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.model-thumbnail-loading,
+.model-thumbnail-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--landing-bg-tertiary);
+  border-radius: 8px;
+}
+
+.model-thumbnail-error span {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.model-thumbnail-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--landing-border);
+  border-top-color: var(--landing-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 :root {
   /* Landing Theme Colors */
   --landing-bg: #0a0a0f;

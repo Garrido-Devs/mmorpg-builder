@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Navbar, SEO } from '@/components/shared'
+import { Navbar, SEO, ModelThumbnail } from '@/components/shared'
 import { ASSETS } from '@/assets/AssetRegistry'
 import type { AssetDefinition } from '@/types'
 import '@/styles/landing.css'
@@ -39,25 +39,6 @@ export function Assets() {
     })
     return groups
   }, [filteredAssets])
-
-  const getAssetIcon = (type: string) => {
-    switch (type) {
-      case 'npc':
-        return '🧙'
-      case 'character':
-        return '🧝'
-      case 'prop':
-        return '🪑'
-      case 'item':
-        return '⚔️'
-      case 'building':
-        return '🏠'
-      case 'prefab':
-        return '📍'
-      default:
-        return '📦'
-    }
-  }
 
   return (
     <div className="landing-page">
@@ -119,7 +100,7 @@ export function Assets() {
                       className={`asset-card-page ${selectedAsset?.id === asset.id ? 'active' : ''}`}
                       onClick={() => setSelectedAsset(asset)}
                     >
-                      <div className="asset-card-icon-page">{getAssetIcon(asset.type)}</div>
+                      <ModelThumbnail modelPath={asset.path} size={48} />
                       <div className="asset-card-info">
                         <h4>{asset.name}</h4>
                         <span className="asset-type">{asset.type}</span>
@@ -148,7 +129,7 @@ export function Assets() {
               </div>
 
               <div className="assets-details-preview">
-                <div className="asset-preview-icon">{getAssetIcon(selectedAsset.type)}</div>
+                <ModelThumbnail modelPath={selectedAsset.path} size={160} />
               </div>
 
               <div className="assets-details-info">
