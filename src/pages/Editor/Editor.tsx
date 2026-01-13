@@ -59,14 +59,19 @@ export function Editor() {
   }, [collaboration.activeUsers])
 
   // Load project and connect collaboration
+  const disconnectRef = useRef(collaboration.disconnect)
+  disconnectRef.current = collaboration.disconnect
+
   useEffect(() => {
     if (projectId) {
       fetchProject(projectId)
       collaboration.connect(projectId)
     }
     return () => {
-      collaboration.disconnect()
+      // Usa ref para evitar re-execução do efeito quando disconnect muda
+      disconnectRef.current()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId])
 
   // Listen for scene changes

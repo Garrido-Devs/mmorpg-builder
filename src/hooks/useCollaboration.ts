@@ -292,12 +292,15 @@ export function useCollaboration() {
     [state.projectId]
   )
 
-  // Cleanup ao desmontar
+  // Cleanup ao desmontar - usa ref para evitar re-execução quando disconnect muda
+  const disconnectRef = useRef(disconnect)
+  disconnectRef.current = disconnect
+
   useEffect(() => {
     return () => {
-      disconnect()
+      disconnectRef.current()
     }
-  }, [disconnect])
+  }, [])
 
   return {
     ...state,
