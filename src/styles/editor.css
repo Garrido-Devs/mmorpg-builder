@@ -81,6 +81,7 @@
   flex-direction: column;
   height: 100vh;
   background: var(--editor-bg-primary);
+  overflow: hidden;
 }
 
 .editor-main {
