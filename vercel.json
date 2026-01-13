@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/((?!api|assets).*)", "destination": "/" }
+    { "source": "/((?!api|assets/).*)", "destination": "/" }
   ],
   "functions": {
     "api/**/*.ts": {
