@@ -79,17 +79,29 @@ export class CollaboratorSystem {
       if (child instanceof THREE.Mesh || child instanceof THREE.SkinnedMesh) {
         child.castShadow = true
         child.receiveShadow = true
-        // Clona material e adiciona cor do usuario
-        if (child.material) {
-          const mat = (child.material as THREE.MeshStandardMaterial).clone()
+
+        // Funcao para configurar um material
+        const configureMaterial = (material: THREE.Material): THREE.Material => {
+          const mat = material.clone() as THREE.MeshStandardMaterial
           // Garante que o material seja opaco (nao transparente)
           mat.transparent = false
           mat.opacity = 1
           mat.depthWrite = true
+          mat.alphaTest = 0
           // Adiciona brilho sutil com a cor do usuario
-          mat.emissive = new THREE.Color(user.color)
-          mat.emissiveIntensity = 0.15
-          child.material = mat
+          if ('emissive' in mat) {
+            mat.emissive = new THREE.Color(user.color)
+            mat.emissiveIntensity = 0.15
+          }
+          mat.needsUpdate = true
+          return mat
+        }
+
+        // Trata material unico ou array de materiais
+        if (Array.isArray(child.material)) {
+          child.material = child.material.map(configureMaterial)
+        } else if (child.material) {
+          child.material = configureMaterial(child.material)
         }
       }
     })

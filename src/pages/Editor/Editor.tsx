@@ -23,9 +23,9 @@ export function Editor() {
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
   const hasChangesRef = useRef(false)
 
-  // Auto-save function
-  const saveToCloud = useCallback(async () => {
-    if (!currentProject || !hasChangesRef.current) return
+  // Save function - pode ser chamada imediatamente ou pelo auto-save
+  const saveToCloud = useCallback(async (force = false) => {
+    if (!currentProject || (!hasChangesRef.current && !force)) return
 
     setIsSaving(true)
     try {
@@ -34,12 +34,17 @@ export function Editor() {
       await updateProjectData('scene', 'main', mapData)
       setLastSaved(new Date())
       hasChangesRef.current = false
+      console.log('[Editor] Salvo no banco de dados')
     } catch (error) {
       console.error('Auto-save failed:', error)
     } finally {
       setIsSaving(false)
     }
   }, [currentProject, updateProjectData])
+
+  // Referencia estavel para saveToCloud
+  const saveToCloudRef = useRef(saveToCloud)
+  saveToCloudRef.current = saveToCloud
 
   // Debug: log estado de colaboração
   useEffect(() => {
@@ -120,20 +125,38 @@ export function Editor() {
     return () => window.removeEventListener('collaboration-scene-change', handleRemoteSceneChange as EventListener)
   }, [])
 
-  // Broadcast local scene changes to collaborators
+  // Broadcast local scene changes to collaborators AND save immediately
   useEffect(() => {
     const handleLocalSceneChange = (event: CustomEvent<{
       type: 'add' | 'remove' | 'update'
       object: unknown
     }>) => {
+      // Broadcast para colaboradores
       if (collaboration.isConnected) {
         collaboration.broadcastSceneChange(event.detail.type, event.detail.object)
       }
+      // Salva imediatamente no banco (com debounce de 1s)
+      hasChangesRef.current = true
+      setTimeout(() => {
+        saveToCloudRef.current(true)
+      }, 1000)
     }
 
     window.addEventListener('local-scene-change', handleLocalSceneChange as EventListener)
     return () => window.removeEventListener('local-scene-change', handleLocalSceneChange as EventListener)
   }, [collaboration.isConnected, collaboration.broadcastSceneChange])
+
+  // Carrega dados da cena quando o projeto é carregado
+  useEffect(() => {
+    if (currentProject?.data?.scene?.main) {
+      const sceneData = currentProject.data.scene.main.data as { objects?: unknown[] }
+      if (sceneData?.objects && Array.isArray(sceneData.objects)) {
+        console.log('[Editor] Carregando cena do banco:', sceneData.objects.length, 'objetos')
+        const engine = getEngine()
+        engine.loadMap(sceneData as Parameters<typeof engine.loadMap>[0])
+      }
+    }
+  }, [currentProject?.id])
 
   // Auto-save timer
   useEffect(() => {
