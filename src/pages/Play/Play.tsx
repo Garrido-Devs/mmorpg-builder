@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Game } from '@/components'
 import { InteractionPrompt } from '@/components/InteractionPrompt'
+import { GameHUD } from '@/components/game/hud'
 import { useGameEngine } from '@/hooks'
 import { SEO } from '@/components/shared'
 import '@/styles/play.css'
@@ -37,6 +38,7 @@ export function Play() {
         </div>
         <div className="play-game">
           <Game />
+          <GameHUD />
           <InteractionPrompt />
         </div>
         <div className="play-controls-hint">
