@@ -7,6 +7,12 @@ interface ColliderData {
   boundingBox: THREE.Box3
 }
 
+interface DynamicCollider {
+  id: string
+  position: THREE.Vector3
+  radius: number
+}
+
 /**
  * CollisionSystem - Sistema de colisão em runtime
  *
@@ -18,8 +24,10 @@ interface ColliderData {
 export class CollisionSystem {
   private scene: THREE.Scene
   private colliders: ColliderData[] = []
+  private dynamicColliders: Map<string, DynamicCollider> = new Map()
   private playerBox: THREE.Box3 = new THREE.Box3()
   private playerSize = new THREE.Vector3(0.8, 1.8, 0.8) // Tamanho do player
+  private playerRadius = 0.4 // Raio do player para colisão esférica
 
   // Callbacks para triggers
   private onTriggerEnterCallbacks: Set<(collider: ColliderData) => void> = new Set()
@@ -30,6 +38,30 @@ export class CollisionSystem {
 
   constructor(scene: THREE.Scene) {
     this.scene = scene
+  }
+
+  /**
+   * Adiciona um collider dinâmico (ex: colaboradores)
+   */
+  public addDynamicCollider(id: string, position: THREE.Vector3, radius = 0.5): void {
+    this.dynamicColliders.set(id, { id, position: position.clone(), radius })
+  }
+
+  /**
+   * Atualiza posição de um collider dinâmico
+   */
+  public updateDynamicCollider(id: string, position: THREE.Vector3): void {
+    const collider = this.dynamicColliders.get(id)
+    if (collider) {
+      collider.position.copy(position)
+    }
+  }
+
+  /**
+   * Remove um collider dinâmico
+   */
+  public removeDynamicCollider(id: string): void {
+    this.dynamicColliders.delete(id)
   }
 
   /**
@@ -92,6 +124,7 @@ export class CollisionSystem {
 
     let finalPosition = desiredPosition.clone()
 
+    // Verifica colisão com colliders estáticos
     for (const collider of this.colliders) {
       // Atualiza bounding box do collider (pode ter se movido)
       collider.boundingBox = this.calculateBoundingBox(collider.object, collider.component)
@@ -116,6 +149,29 @@ export class CollisionSystem {
           this.activeTriggers.delete(entityId)
           this.notifyTriggerExit(collider)
         }
+      }
+    }
+
+    // Verifica colisão com colliders dinâmicos (colaboradores)
+    for (const [, dynCollider] of this.dynamicColliders) {
+      const distance = new THREE.Vector2(
+        finalPosition.x - dynCollider.position.x,
+        finalPosition.z - dynCollider.position.z
+      ).length()
+
+      const minDistance = this.playerRadius + dynCollider.radius
+
+      if (distance < minDistance && distance > 0) {
+        // Empurra o player para fora
+        const pushDir = new THREE.Vector2(
+          finalPosition.x - dynCollider.position.x,
+          finalPosition.z - dynCollider.position.z
+        ).normalize()
+
+        const pushAmount = minDistance - distance
+
+        finalPosition.x += pushDir.x * pushAmount
+        finalPosition.z += pushDir.y * pushAmount
       }
     }
 

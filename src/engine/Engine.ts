@@ -75,6 +75,9 @@ export class Engine {
     this.aiSystem = new AISystem(this.gameScene.scene)
     this.collaboratorSystem = new CollaboratorSystem(this.gameScene.scene)
 
+    // Conecta collision system ao collaborator system para colisão entre players
+    this.collaboratorSystem.setCollisionSystem(this.collisionSystem)
+
     // Inicializa game loop
     this.gameLoop = new GameLoop()
     this.gameLoop.onUpdate(this.update.bind(this))

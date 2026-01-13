@@ -2,11 +2,13 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
 import type { CollaboratorInfo } from '../types/collaboration'
+import type { CollisionSystem } from './CollisionSystem'
 
 const gltfLoader = new GLTFLoader()
 
 // Modelo usado para colaboradores
 const COLLABORATOR_MODEL = '/assets/models/characters/Mage.glb'
+const COLLABORATOR_COLLISION_RADIUS = 0.5
 
 interface CollaboratorMesh {
   group: THREE.Group
@@ -23,6 +25,7 @@ interface CollaboratorMesh {
  */
 export class CollaboratorSystem {
   private scene: THREE.Scene
+  private collisionSystem: CollisionSystem | null = null
   private collaborators: Map<string, CollaboratorMesh> = new Map()
   private modelTemplate: THREE.Group | null = null
   private modelAnimations: THREE.AnimationClip[] = []
@@ -32,6 +35,13 @@ export class CollaboratorSystem {
   constructor(scene: THREE.Scene) {
     this.scene = scene
     this.preloadModel()
+  }
+
+  /**
+   * Define o sistema de colisão para registrar colliders dinâmicos
+   */
+  public setCollisionSystem(collisionSystem: CollisionSystem): void {
+    this.collisionSystem = collisionSystem
   }
 
   /**
@@ -132,6 +142,15 @@ export class CollaboratorSystem {
       targetPosition: new THREE.Vector3(pos.x, pos.y, pos.z),
       userId: user.id,
     })
+
+    // Registra collider dinâmico para colisão com player
+    if (this.collisionSystem) {
+      this.collisionSystem.addDynamicCollider(
+        user.id,
+        new THREE.Vector3(pos.x, pos.y, pos.z),
+        COLLABORATOR_COLLISION_RADIUS
+      )
+    }
   }
 
   /**
@@ -206,6 +225,11 @@ export class CollaboratorSystem {
 
     this.scene.remove(collab.group)
     this.collaborators.delete(userId)
+
+    // Remove collider dinâmico
+    if (this.collisionSystem) {
+      this.collisionSystem.removeDynamicCollider(userId)
+    }
   }
 
   /**
@@ -240,6 +264,11 @@ export class CollaboratorSystem {
     this.collaborators.forEach((collab) => {
       // Interpola posicao
       collab.group.position.lerp(collab.targetPosition, deltaTime * 5)
+
+      // Atualiza collider dinâmico com nova posição
+      if (this.collisionSystem) {
+        this.collisionSystem.updateDynamicCollider(collab.userId, collab.group.position)
+      }
 
       // Atualiza animacoes
       if (collab.mixer) {
