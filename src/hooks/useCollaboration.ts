@@ -158,6 +158,23 @@ export function useCollaboration() {
       )
     })
 
+    // Evento de mudança de cena (add/remove/update objetos)
+    channelRef.current.bind('scene-change', (data: {
+      userId: string
+      changeType: 'add' | 'remove' | 'update'
+      object: unknown
+      timestamp: string
+    }) => {
+      // Ignorar mudanças do próprio usuário
+      if (data.userId === currentUserIdRef.current) return
+
+      console.log('[Collaboration] scene-change recebido:', data.changeType)
+      // Emitir evento customizado para o Editor aplicar a mudança
+      window.dispatchEvent(
+        new CustomEvent('collaboration-scene-change', { detail: data })
+      )
+    })
+
     // Notificar servidor que entrou
     console.log('[Collaboration] Notificando servidor (sync join)...')
     try {
@@ -265,6 +282,25 @@ export function useCollaboration() {
     [state.projectId]
   )
 
+  // Broadcast mudança de cena (add/remove/update objetos)
+  const broadcastSceneChange = useCallback(
+    (changeType: 'add' | 'remove' | 'update', object: unknown) => {
+      if (!state.projectId) return
+
+      realtimeApi.sync({
+        projectId: state.projectId,
+        action: 'scene-change',
+        sceneChange: {
+          type: changeType,
+          object,
+        },
+      }).catch((err) => {
+        console.error('[Collaboration] Erro ao broadcast scene-change:', err)
+      })
+    },
+    [state.projectId]
+  )
+
   // Sincronizar dados (usado pelo hook useProject)
   const syncData = useCallback(
     async (_type: string, _key: string, _data: unknown, _version?: number): Promise<boolean> => {
@@ -309,5 +345,6 @@ export function useCollaboration() {
     updateCursor,
     updateSelection,
     syncData,
+    broadcastSceneChange,
   }
 }

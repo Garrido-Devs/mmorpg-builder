@@ -164,12 +164,20 @@
 .editor-topbar-users {
   display: flex;
   align-items: center;
-  gap: -8px;
+  gap: 4px;
+}
+
+.editor-topbar-users-empty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--editor-text-muted);
 }
 
 .editor-topbar-user {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--editor-bg-tertiary);
   border: 2px solid var(--editor-accent);
@@ -177,21 +185,47 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--editor-text-primary);
-  margin-left: -8px;
   position: relative;
+  cursor: pointer;
+  transition: transform var(--editor-transition), box-shadow var(--editor-transition);
 }
 
-.editor-topbar-user:first-child {
-  margin-left: 0;
+.editor-topbar-user:hover {
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: var(--editor-shadow);
+}
+
+.editor-topbar-user-current {
+  border-width: 3px;
+  box-shadow: 0 0 0 2px var(--editor-bg-secondary), 0 0 8px rgba(99, 102, 241, 0.5);
 }
 
 .editor-topbar-user img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.editor-topbar-user-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--editor-bg-secondary);
+}
+
+.editor-topbar-user-dot-offline {
+  background: var(--editor-text-muted);
+  width: 8px;
+  height: 8px;
+  border: none;
+  animation: pulse 1.5s infinite;
 }
 
 .editor-topbar-user-more {

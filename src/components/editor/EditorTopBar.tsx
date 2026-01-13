@@ -39,7 +39,10 @@ export function EditorTopBar({
     engine.editorSystem.setTransformMode(tool)
   }, [])
 
+  // Organiza: usuário atual primeiro, depois outros
+  const currentUser = activeUsers.find(u => u.isCurrentUser)
   const otherUsers = activeUsers.filter(u => !u.isCurrentUser)
+  const allUsers = currentUser ? [currentUser, ...otherUsers] : otherUsers
 
   return (
     <header className="editor-topbar">
@@ -102,28 +105,38 @@ export function EditorTopBar({
           </div>
       )}
 
-      {/* Usuários online */}
-      {otherUsers.length > 0 && (
+      {/* Usuários online - sempre mostra quando há projeto */}
+      {project && (
         <>
           <div className="editor-topbar-divider" />
           <div className="editor-topbar-users">
-            {otherUsers.slice(0, 4).map((user) => (
-              <div
-                key={user.id}
-                className="editor-topbar-user"
-                title={user.name}
-                style={{ borderColor: user.color }}
-              >
-                {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt={user.name} />
-                ) : (
-                  <span>{user.name.charAt(0).toUpperCase()}</span>
+            {allUsers.length > 0 ? (
+              <>
+                {allUsers.slice(0, 5).map((user) => (
+                  <div
+                    key={user.id}
+                    className={`editor-topbar-user ${user.isCurrentUser ? 'editor-topbar-user-current' : ''}`}
+                    title={`${user.name}${user.isCurrentUser ? ' (você)' : ''}`}
+                    style={{ borderColor: user.color }}
+                  >
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user.name} />
+                    ) : (
+                      <span>{user.name.charAt(0).toUpperCase()}</span>
+                    )}
+                    <span className="editor-topbar-user-dot" style={{ background: user.color }} />
+                  </div>
+                ))}
+                {allUsers.length > 5 && (
+                  <div className="editor-topbar-user editor-topbar-user-more">
+                    +{allUsers.length - 5}
+                  </div>
                 )}
-              </div>
-            ))}
-            {otherUsers.length > 4 && (
-              <div className="editor-topbar-user editor-topbar-user-more">
-                +{otherUsers.length - 4}
+              </>
+            ) : (
+              <div className="editor-topbar-users-empty">
+                <span className="editor-topbar-user-dot editor-topbar-user-dot-offline" />
+                <span>Conectando...</span>
               </div>
             )}
           </div>

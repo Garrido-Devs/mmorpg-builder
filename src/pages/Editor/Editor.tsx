@@ -83,7 +83,7 @@ export function Editor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId])
 
-  // Listen for scene changes
+  // Listen for local scene changes (mark as dirty for auto-save)
   useEffect(() => {
     const handleSceneChange = () => {
       hasChangesRef.current = true
@@ -92,6 +92,48 @@ export function Editor() {
     window.addEventListener('scene-changed', handleSceneChange)
     return () => window.removeEventListener('scene-changed', handleSceneChange)
   }, [])
+
+  // Listen for remote scene changes (from other collaborators)
+  useEffect(() => {
+    const handleRemoteSceneChange = (event: CustomEvent<{
+      userId: string
+      changeType: 'add' | 'remove' | 'update'
+      object: unknown
+    }>) => {
+      const { changeType, object } = event.detail
+      const engine = getEngine()
+
+      console.log('[Editor] Recebendo scene-change remoto:', changeType, object)
+
+      if (changeType === 'add' && object) {
+        engine.addObjectFromData(object as Parameters<typeof engine.addObjectFromData>[0])
+      } else if (changeType === 'remove' && object && typeof object === 'object' && 'id' in object) {
+        engine.removeObject((object as { id: string }).id)
+      } else if (changeType === 'update' && object) {
+        engine.updateObjectFromData(object as Parameters<typeof engine.updateObjectFromData>[0])
+      }
+
+      hasChangesRef.current = true
+    }
+
+    window.addEventListener('collaboration-scene-change', handleRemoteSceneChange as EventListener)
+    return () => window.removeEventListener('collaboration-scene-change', handleRemoteSceneChange as EventListener)
+  }, [])
+
+  // Broadcast local scene changes to collaborators
+  useEffect(() => {
+    const handleLocalSceneChange = (event: CustomEvent<{
+      type: 'add' | 'remove' | 'update'
+      object: unknown
+    }>) => {
+      if (collaboration.isConnected) {
+        collaboration.broadcastSceneChange(event.detail.type, event.detail.object)
+      }
+    }
+
+    window.addEventListener('local-scene-change', handleLocalSceneChange as EventListener)
+    return () => window.removeEventListener('local-scene-change', handleLocalSceneChange as EventListener)
+  }, [collaboration.isConnected, collaboration.broadcastSceneChange])
 
   // Auto-save timer
   useEffect(() => {

@@ -49,7 +49,8 @@ function getPusher(): Pusher | null {
  * - projectId: string
  * - cursorPosition?: { x, y, z }
  * - selectedElement?: string
- * - action?: 'join' | 'leave' | 'update'
+ * - action?: 'join' | 'leave' | 'update' | 'scene-change'
+ * - sceneChange?: { type: 'add' | 'remove' | 'update', object: MapObjectData }
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -62,7 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { projectId, cursorPosition, selectedElement, action = 'update' } = req.body
+    const { projectId, cursorPosition, selectedElement, action = 'update', sceneChange } = req.body
 
     if (!projectId) {
       return res.status(400).json({ error: 'Project ID is required' })
@@ -136,6 +137,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       return res.status(200).json({ success: true, action: 'left' })
+    }
+
+    // Scene-change - notificar mudanças na cena (add/remove/update objetos)
+    if (action === 'scene-change' && sceneChange) {
+      // Notificar outros usuários
+      if (pusher) {
+        await pusher.trigger(`project-${projectId}`, 'scene-change', {
+          userId: auth.userId,
+          changeType: sceneChange.type,
+          object: sceneChange.object,
+          timestamp: new Date().toISOString(),
+        })
+      }
+
+      return res.status(200).json({ success: true, action: 'scene-change' })
     }
 
     // Update - atualizar posição/seleção

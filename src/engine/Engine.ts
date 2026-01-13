@@ -244,7 +244,7 @@ export class Engine {
   /**
    * Adiciona um objeto ao mapa a partir de um asset
    */
-  public placeObject(asset: AssetDefinition, position: THREE.Vector3): MapObject {
+  public placeObject(asset: AssetDefinition, position: THREE.Vector3, broadcast = true): MapObject {
     const mapObject = new MapObject(asset.id, asset)
     mapObject.setPosition(position)
 
@@ -258,6 +258,14 @@ export class Engine {
     this.aiSystem.registerNPC(mapObject.mesh)
 
     this.notifyMapUpdate()
+
+    // Broadcast para colaboradores
+    if (broadcast) {
+      window.dispatchEvent(new CustomEvent('local-scene-change', {
+        detail: { type: 'add', object: mapObject.serialize() }
+      }))
+    }
+
     return mapObject
   }
 
@@ -271,15 +279,91 @@ export class Engine {
   /**
    * Remove um objeto do mapa
    */
-  public removeObject(id: string): void {
+  public removeObject(id: string, broadcast = true): void {
     const obj = this.mapObjects.get(id)
     if (obj) {
+      // Serializa antes de remover para broadcast
+      const serialized = broadcast ? obj.serialize() : null
+
       // Remove helpers de componentes
       this.componentSystem.removeObject(obj.mesh.userData.entityId)
       this.gameScene.remove(obj.mesh)
       this.mapObjects.delete(id)
       this.notifyMapUpdate()
+
+      // Broadcast para colaboradores
+      if (broadcast && serialized) {
+        window.dispatchEvent(new CustomEvent('local-scene-change', {
+          detail: { type: 'remove', object: serialized }
+        }))
+      }
     }
+  }
+
+  /**
+   * Adiciona objeto a partir de dados serializados (usado para colaboração)
+   */
+  public addObjectFromData(objData: MapObjectData): void {
+    // Verifica se já existe
+    if (this.mapObjects.has(objData.id)) {
+      console.log('[Engine] Objeto já existe, atualizando:', objData.id)
+      this.updateObjectFromData(objData)
+      return
+    }
+
+    const asset = getAssetById(objData.assetId)
+    if (!asset) {
+      console.warn('[Engine] Asset não encontrado:', objData.assetId)
+      return
+    }
+
+    console.log('[Engine] Adicionando objeto via colaboração:', objData.id)
+
+    const mapObject = new MapObject(asset.id, asset)
+    mapObject.id = objData.id // Preserva ID original
+
+    // Aplica transformações
+    mapObject.setPosition(objData.transform.position)
+    mapObject.setRotation(objData.transform.rotation)
+    mapObject.setScale(objData.transform.scale)
+
+    // Restaura componentes
+    if (objData.components?.length) {
+      mapObject.setComponents(objData.components)
+    }
+
+    this.mapObjects.set(mapObject.id, mapObject)
+    this.gameScene.add(mapObject.mesh)
+    this.componentSystem.processComponents(mapObject.mesh)
+    this.aiSystem.registerNPC(mapObject.mesh)
+    this.notifyMapUpdate()
+  }
+
+  /**
+   * Atualiza objeto existente a partir de dados (usado para colaboração)
+   */
+  public updateObjectFromData(objData: MapObjectData): void {
+    const obj = this.mapObjects.get(objData.id)
+    if (!obj) {
+      console.log('[Engine] Objeto não encontrado para update, adicionando:', objData.id)
+      this.addObjectFromData(objData)
+      return
+    }
+
+    console.log('[Engine] Atualizando objeto via colaboração:', objData.id)
+
+    // Atualiza transformações
+    obj.setPosition(objData.transform.position)
+    obj.setRotation(objData.transform.rotation)
+    obj.setScale(objData.transform.scale)
+
+    // Atualiza componentes
+    if (objData.components?.length) {
+      obj.setComponents(objData.components)
+      this.componentSystem.processComponents(obj.mesh)
+    }
+
+    this.notifyMapUpdate()
   }
 
   /**

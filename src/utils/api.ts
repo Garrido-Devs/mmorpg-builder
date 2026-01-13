@@ -128,7 +128,11 @@ export const realtimeApi = {
     projectId: string
     cursorPosition?: { x: number; y: number; z: number }
     selectedElement?: string
-    action?: 'join' | 'leave' | 'update'
+    action?: 'join' | 'leave' | 'update' | 'scene-change'
+    sceneChange?: {
+      type: 'add' | 'remove' | 'update'
+      object: unknown
+    }
   }) => apiRequest<{ success: boolean }>('/realtime/sync', { method: 'POST', body: data }),
 
   presence: (projectId: string) =>
