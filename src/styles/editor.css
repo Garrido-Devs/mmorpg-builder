@@ -1,0 +1,909 @@
+/* ============================================
+   Editor UI Profissional - Estilo Game Engine
+   ============================================ */
+
+:root {
+  /* Cores do tema escuro profissional */
+  --editor-bg-primary: #1e1e2e;
+  --editor-bg-secondary: #252536;
+  --editor-bg-tertiary: #2d2d42;
+  --editor-bg-hover: #353550;
+  --editor-bg-active: #3d3d5c;
+
+  /* Cores de acento */
+  --editor-accent: #6366f1;
+  --editor-accent-hover: #818cf8;
+  --editor-accent-muted: #4f46e5;
+  --editor-success: #22c55e;
+  --editor-warning: #f59e0b;
+  --editor-error: #ef4444;
+  --editor-info: #3b82f6;
+
+  /* Texto */
+  --editor-text-primary: #f1f5f9;
+  --editor-text-secondary: #94a3b8;
+  --editor-text-muted: #64748b;
+
+  /* Bordas */
+  --editor-border: #3d3d5c;
+  --editor-border-light: #4d4d6d;
+
+  /* Sombras */
+  --editor-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --editor-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+
+  /* Espaçamentos */
+  --editor-space-xs: 4px;
+  --editor-space-sm: 8px;
+  --editor-space-md: 12px;
+  --editor-space-lg: 16px;
+  --editor-space-xl: 24px;
+
+  /* Tipografia */
+  --editor-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --editor-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Transições */
+  --editor-transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   Reset e Base
+   ============================================ */
+
+.editor-root {
+  font-family: var(--editor-font-sans);
+  font-size: 13px;
+  color: var(--editor-text-primary);
+  line-height: 1.5;
+  width: 100%;
+  height: 100%;
+}
+
+.editor-root * {
+  box-sizing: border-box;
+}
+
+.editor-root input,
+.editor-root select,
+.editor-root textarea,
+.editor-root button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* ============================================
+   Layout Principal
+   ============================================ */
+
+.editor-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--editor-bg-primary);
+}
+
+.editor-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.editor-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================================
+   Top Bar
+   ============================================ */
+
+.editor-topbar {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  min-height: 40px;
+  flex-shrink: 0;
+  padding: 0 var(--editor-space-md);
+  background: var(--editor-bg-secondary);
+  border-bottom: 1px solid var(--editor-border);
+  gap: var(--editor-space-md);
+  z-index: 100;
+  position: relative;
+}
+
+.editor-topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+  font-weight: 600;
+  color: var(--editor-accent);
+}
+
+.editor-topbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--editor-border);
+}
+
+.editor-topbar-tools {
+  display: flex;
+  gap: var(--editor-space-xs);
+}
+
+.editor-topbar-actions {
+  display: flex;
+  gap: var(--editor-space-sm);
+  margin-left: auto;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   Painéis Laterais
+   ============================================ */
+
+.editor-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  min-width: 280px;
+  max-width: 500px;
+  background: var(--editor-bg-secondary);
+  border-left: 1px solid var(--editor-border);
+  overflow: hidden;
+  min-height: 0; /* Importante para scroll funcionar em flexbox */
+}
+
+.editor-sidebar-left {
+  border-left: none;
+  border-right: 1px solid var(--editor-border);
+}
+
+.editor-sidebar-resizer {
+  width: 4px;
+  cursor: ew-resize;
+  background: transparent;
+  transition: background var(--editor-transition);
+}
+
+.editor-sidebar-resizer:hover {
+  background: var(--editor-accent);
+}
+
+/* ============================================
+   Abas (Tabs)
+   ============================================ */
+
+.editor-tabs {
+  display: flex;
+  background: var(--editor-bg-primary);
+  border-bottom: 1px solid var(--editor-border);
+  overflow-x: auto;
+  min-height: 36px;
+  flex-shrink: 0;
+}
+
+.editor-tabs::-webkit-scrollbar {
+  height: 2px;
+}
+
+.editor-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+  padding: var(--editor-space-sm) var(--editor-space-lg);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--editor-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--editor-transition);
+}
+
+.editor-tab:hover {
+  color: var(--editor-text-primary);
+  background: var(--editor-bg-hover);
+}
+
+.editor-tab.active {
+  color: var(--editor-accent);
+  border-bottom-color: var(--editor-accent);
+  background: var(--editor-bg-secondary);
+}
+
+.editor-tab-icon {
+  font-size: 14px;
+}
+
+/* ============================================
+   Painéis de Conteúdo
+   ============================================ */
+
+.editor-panel {
+  flex: 1;
+  min-height: 0; /* Importante para scroll funcionar em flexbox */
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--editor-space-md);
+  background: var(--editor-bg-tertiary);
+  border-bottom: 1px solid var(--editor-border);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--editor-text-secondary);
+}
+
+.editor-panel-content {
+  flex: 1;
+  min-height: 0; /* Importante para scroll funcionar em flexbox */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--editor-space-md);
+}
+
+.editor-panel-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editor-panel-content::-webkit-scrollbar-track {
+  background: var(--editor-bg-primary);
+}
+
+.editor-panel-content::-webkit-scrollbar-thumb {
+  background: var(--editor-border);
+  border-radius: 4px;
+}
+
+.editor-panel-content::-webkit-scrollbar-thumb:hover {
+  background: var(--editor-border-light);
+}
+
+/* ============================================
+   Seções Colapsáveis
+   ============================================ */
+
+.editor-section {
+  margin-bottom: var(--editor-space-md);
+  background: var(--editor-bg-tertiary);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.editor-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+  padding: var(--editor-space-sm) var(--editor-space-md);
+  background: var(--editor-bg-tertiary);
+  border: none;
+  color: var(--editor-text-primary);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  transition: background var(--editor-transition);
+}
+
+.editor-section-header:hover {
+  background: var(--editor-bg-hover);
+}
+
+.editor-section-icon {
+  transition: transform var(--editor-transition);
+}
+
+.editor-section-header.collapsed .editor-section-icon {
+  transform: rotate(-90deg);
+}
+
+.editor-section-content {
+  padding: var(--editor-space-md);
+  border-top: 1px solid var(--editor-border);
+}
+
+.editor-section-content.collapsed {
+  display: none;
+}
+
+/* ============================================
+   Botões
+   ============================================ */
+
+.editor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--editor-space-sm);
+  padding: var(--editor-space-sm) var(--editor-space-md);
+  background: var(--editor-bg-tertiary);
+  border: 1px solid var(--editor-border);
+  border-radius: 4px;
+  color: var(--editor-text-primary);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all var(--editor-transition);
+}
+
+.editor-btn:hover {
+  background: var(--editor-bg-hover);
+  border-color: var(--editor-border-light);
+}
+
+.editor-btn:active {
+  background: var(--editor-bg-active);
+}
+
+.editor-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.editor-btn-primary {
+  background: var(--editor-accent);
+  border-color: var(--editor-accent);
+}
+
+.editor-btn-primary:hover {
+  background: var(--editor-accent-hover);
+  border-color: var(--editor-accent-hover);
+}
+
+.editor-btn-icon {
+  padding: var(--editor-space-sm);
+  min-width: 32px;
+  height: 32px;
+}
+
+.editor-btn-icon.active {
+  background: var(--editor-accent);
+  border-color: var(--editor-accent);
+}
+
+.editor-btn-sm {
+  padding: var(--editor-space-xs) var(--editor-space-sm);
+  font-size: 11px;
+}
+
+.editor-btn-group {
+  display: flex;
+  gap: 1px;
+  background: var(--editor-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.editor-btn-group .editor-btn {
+  border-radius: 0;
+  border: none;
+}
+
+/* ============================================
+   Inputs
+   ============================================ */
+
+.editor-input {
+  width: 100%;
+  padding: var(--editor-space-sm) var(--editor-space-md);
+  background: var(--editor-bg-primary);
+  border: 1px solid var(--editor-border);
+  border-radius: 4px;
+  color: var(--editor-text-primary);
+  font-size: 12px;
+  transition: border-color var(--editor-transition);
+}
+
+.editor-input:focus {
+  outline: none;
+  border-color: var(--editor-accent);
+}
+
+.editor-input::placeholder {
+  color: var(--editor-text-muted);
+}
+
+.editor-input-number {
+  font-family: var(--editor-font-mono);
+  text-align: right;
+}
+
+.editor-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+}
+
+.editor-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+  cursor: pointer;
+}
+
+.editor-checkbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--editor-accent);
+}
+
+.editor-color-input {
+  width: 32px;
+  height: 32px;
+  padding: 2px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ============================================
+   Propriedades (Inspector)
+   ============================================ */
+
+.editor-property {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+  margin-bottom: var(--editor-space-sm);
+}
+
+.editor-property-label {
+  flex-shrink: 0;
+  width: 100px;
+  font-size: 11px;
+  color: var(--editor-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-property-value {
+  flex: 1;
+  display: flex;
+  gap: var(--editor-space-xs);
+}
+
+.editor-property-value .editor-input {
+  flex: 1;
+}
+
+.editor-vector3 {
+  display: flex;
+  gap: var(--editor-space-xs);
+}
+
+.editor-vector3-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.editor-vector3-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--editor-text-muted);
+  width: 12px;
+  text-align: center;
+}
+
+.editor-vector3-label.x { color: #ef4444; }
+.editor-vector3-label.y { color: #22c55e; }
+.editor-vector3-label.z { color: #3b82f6; }
+
+/* ============================================
+   Lista de Componentes
+   ============================================ */
+
+.editor-component {
+  background: var(--editor-bg-primary);
+  border: 1px solid var(--editor-border);
+  border-radius: 6px;
+  margin-bottom: var(--editor-space-sm);
+  overflow: hidden;
+}
+
+.editor-component-header {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+  padding: var(--editor-space-sm) var(--editor-space-md);
+  background: var(--editor-bg-tertiary);
+  cursor: pointer;
+}
+
+.editor-component-icon {
+  font-size: 16px;
+}
+
+.editor-component-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.editor-component-toggle {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--editor-accent);
+}
+
+.editor-component-actions {
+  display: flex;
+  gap: var(--editor-space-xs);
+  opacity: 0;
+  transition: opacity var(--editor-transition);
+}
+
+.editor-component:hover .editor-component-actions {
+  opacity: 1;
+}
+
+.editor-component-content {
+  padding: var(--editor-space-md);
+  border-top: 1px solid var(--editor-border);
+}
+
+/* ============================================
+   Asset Browser
+   ============================================ */
+
+.editor-search {
+  position: relative;
+  margin-bottom: var(--editor-space-md);
+}
+
+.editor-search-input {
+  padding-left: 32px;
+}
+
+.editor-search-icon {
+  position: absolute;
+  left: var(--editor-space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--editor-text-muted);
+  pointer-events: none;
+}
+
+.editor-asset-category {
+  margin-bottom: var(--editor-space-lg);
+}
+
+.editor-asset-category-title {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+  margin-bottom: var(--editor-space-sm);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--editor-text-muted);
+}
+
+.editor-asset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--editor-space-sm);
+}
+
+.editor-asset-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--editor-space-md);
+  background: var(--editor-bg-tertiary);
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--editor-transition);
+}
+
+.editor-asset-item:hover {
+  background: var(--editor-bg-hover);
+  border-color: var(--editor-border-light);
+}
+
+.editor-asset-item.active {
+  border-color: var(--editor-accent);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.editor-asset-preview {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--editor-bg-primary);
+  border-radius: 6px;
+  margin-bottom: var(--editor-space-sm);
+  font-size: 32px;
+}
+
+.editor-asset-name {
+  font-size: 11px;
+  color: var(--editor-text-secondary);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+/* ============================================
+   Hierarchy Tree
+   ============================================ */
+
+.editor-tree {
+  font-size: 12px;
+}
+
+.editor-tree-item {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+  padding: var(--editor-space-xs) var(--editor-space-sm);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background var(--editor-transition);
+}
+
+.editor-tree-item:hover {
+  background: var(--editor-bg-hover);
+}
+
+.editor-tree-item.selected {
+  background: var(--editor-accent);
+}
+
+.editor-tree-item.selected .editor-tree-name {
+  color: white;
+}
+
+.editor-tree-toggle {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--editor-text-muted);
+}
+
+.editor-tree-icon {
+  font-size: 14px;
+}
+
+.editor-tree-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-tree-children {
+  padding-left: var(--editor-space-lg);
+}
+
+/* ============================================
+   Status Bar
+   ============================================ */
+
+.editor-statusbar {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  min-height: 24px;
+  flex-shrink: 0;
+  padding: 0 var(--editor-space-md);
+  background: var(--editor-bg-secondary);
+  border-top: 1px solid var(--editor-border);
+  font-size: 11px;
+  color: var(--editor-text-muted);
+  gap: var(--editor-space-lg);
+}
+
+.editor-statusbar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-xs);
+}
+
+.editor-statusbar-divider {
+  width: 1px;
+  height: 12px;
+  background: var(--editor-border);
+}
+
+/* ============================================
+   Tooltip
+   ============================================ */
+
+.editor-tooltip {
+  position: absolute;
+  padding: var(--editor-space-xs) var(--editor-space-sm);
+  background: var(--editor-bg-primary);
+  border: 1px solid var(--editor-border);
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--editor-text-secondary);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: var(--editor-shadow);
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+
+.editor-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--editor-space-xl);
+  color: var(--editor-text-muted);
+  text-align: center;
+}
+
+.editor-empty-icon {
+  font-size: 48px;
+  margin-bottom: var(--editor-space-md);
+  opacity: 0.5;
+}
+
+.editor-empty-text {
+  font-size: 12px;
+}
+
+/* ============================================
+   Add Component Dropdown
+   ============================================ */
+
+.editor-dropdown {
+  position: relative;
+}
+
+.editor-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: var(--editor-space-xs);
+  background: var(--editor-bg-secondary);
+  border: 1px solid var(--editor-border);
+  border-radius: 6px;
+  box-shadow: var(--editor-shadow-lg);
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.editor-dropdown-category {
+  padding: var(--editor-space-xs) var(--editor-space-md);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--editor-text-muted);
+  background: var(--editor-bg-primary);
+}
+
+.editor-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+  padding: var(--editor-space-sm) var(--editor-space-md);
+  cursor: pointer;
+  transition: background var(--editor-transition);
+}
+
+.editor-dropdown-item:hover {
+  background: var(--editor-bg-hover);
+}
+
+.editor-dropdown-item-icon {
+  font-size: 14px;
+}
+
+.editor-dropdown-item-name {
+  flex: 1;
+}
+
+.editor-dropdown-item-desc {
+  font-size: 10px;
+  color: var(--editor-text-muted);
+}
+
+/* ============================================
+   Modal
+   ============================================ */
+
+.editor-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.editor-modal {
+  background: var(--editor-bg-secondary);
+  border: 1px solid var(--editor-border);
+  border-radius: 8px;
+  box-shadow: var(--editor-shadow-lg);
+  min-width: 400px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.editor-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--editor-space-md) var(--editor-space-lg);
+  border-bottom: 1px solid var(--editor-border);
+}
+
+.editor-modal-title {
+  font-weight: 600;
+}
+
+.editor-modal-body {
+  padding: var(--editor-space-lg);
+  overflow-y: auto;
+}
+
+.editor-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--editor-space-sm);
+  padding: var(--editor-space-md) var(--editor-space-lg);
+  border-top: 1px solid var(--editor-border);
+}
+
+/* ============================================
+   Badge
+   ============================================ */
+
+.editor-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  background: var(--editor-bg-tertiary);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.editor-badge-primary {
+  background: var(--editor-accent);
+  color: white;
+}
+
+.editor-badge-success {
+  background: var(--editor-success);
+  color: white;
+}
+
+.editor-badge-warning {
+  background: var(--editor-warning);
+  color: black;
+}
+
+.editor-badge-error {
+  background: var(--editor-error);
+  color: white;
+}
