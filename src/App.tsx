@@ -5,6 +5,7 @@ import { Docs } from './pages/Docs'
 import { Assets } from './pages/Assets'
 import { Editor } from './pages/Editor'
 import { Showcase } from './pages/Showcase'
+import { Play } from './pages/Play'
 import './styles/index.css'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/assets" element={<Assets />} />
         <Route path="/showcase" element={<Showcase />} />
         <Route path="/editor" element={<Editor />} />
+        <Route path="/play" element={<Play />} />
       </Routes>
     </>
   )

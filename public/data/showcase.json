@@ -5,7 +5,7 @@
       "name": "Demo Village",
       "author": "MMORPG Builder Team",
       "description": "Demonstracao do sistema com uma vila inicial, NPCs e sistema de combate.",
-      "url": "https://mmorpg-builder.vercel.app/editor",
+      "url": "/play",
       "thumbnail": "/assets/models/characters/Knight.glb",
       "tags": ["demo", "rpg", "fantasy"],
       "createdAt": "2024-01-01"

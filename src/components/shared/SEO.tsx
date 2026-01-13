@@ -13,14 +13,18 @@ const DEFAULT_DESCRIPTION = 'Crie seu proprio MMORPG 3D no navegador. Editor vis
 const DEFAULT_KEYWORDS = 'mmorpg, game builder, editor de jogos, three.js, react, typescript, 3d game, rpg maker, game engine, open source, criar jogos, desenvolvimento de jogos'
 const SITE_URL = 'https://mmorpg-builder.vercel.app'
 
+const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`
+
 export function SEO({
   title,
   description = DEFAULT_DESCRIPTION,
   keywords = DEFAULT_KEYWORDS,
-  image = '/og-image.png',
+  image = DEFAULT_IMAGE,
   url = SITE_URL,
 }: SEOProps) {
   const fullTitle = title ? `${title} | MMORPG Builder` : DEFAULT_TITLE
+  // Ensure image URL is absolute
+  const absoluteImageUrl = image.startsWith('http') ? image : `${SITE_URL}${image}`
 
   return (
     <Helmet>
@@ -37,7 +41,9 @@ export function SEO({
       <meta property="og:url" content={url} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
+      <meta property="og:image" content={absoluteImageUrl} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="og:site_name" content="MMORPG Builder" />
       <meta property="og:locale" content="pt_BR" />
 
@@ -46,7 +52,7 @@ export function SEO({
       <meta name="twitter:url" content={url} />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
+      <meta name="twitter:image" content={absoluteImageUrl} />
 
       {/* Additional SEO */}
       <meta name="theme-color" content="#6366f1" />

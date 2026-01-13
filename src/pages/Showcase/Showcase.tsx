@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { Navbar, SEO, ModelThumbnail } from '@/components/shared'
 import '@/styles/landing.css'
 import '@/styles/showcase.css'
@@ -19,6 +20,9 @@ interface ShowcaseData {
   submitUrl: string
 }
 
+// Check if URL is internal (starts with /)
+const isInternalUrl = (url: string) => url.startsWith('/')
+
 export function Showcase() {
   const [data, setData] = useState<ShowcaseData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -32,6 +36,53 @@ export function Showcase() {
       })
       .catch(() => setLoading(false))
   }, [])
+
+  const renderGameCard = (game: GameEntry) => {
+    const cardContent = (
+      <>
+        <div className="showcase-card-thumbnail">
+          {game.thumbnail.endsWith('.glb') ? (
+            <ModelThumbnail modelPath={game.thumbnail} size={200} />
+          ) : (
+            <img src={game.thumbnail} alt={game.name} />
+          )}
+        </div>
+        <div className="showcase-card-content">
+          <h3>{game.name}</h3>
+          <p className="showcase-card-author">por {game.author}</p>
+          <p className="showcase-card-description">{game.description}</p>
+          <div className="showcase-card-tags">
+            {game.tags.map((tag) => (
+              <span key={tag} className="showcase-tag">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </>
+    )
+
+    // Use Link for internal URLs, anchor for external
+    if (isInternalUrl(game.url)) {
+      return (
+        <Link key={game.id} to={game.url} className="showcase-card">
+          {cardContent}
+        </Link>
+      )
+    }
+
+    return (
+      <a
+        key={game.id}
+        href={game.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="showcase-card"
+      >
+        {cardContent}
+      </a>
+    )
+  }
 
   return (
     <div className="landing-page">
@@ -56,35 +107,7 @@ export function Showcase() {
             </div>
           ) : data && data.games.length > 0 ? (
             <div className="showcase-grid">
-              {data.games.map((game) => (
-                <a
-                  key={game.id}
-                  href={game.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="showcase-card"
-                >
-                  <div className="showcase-card-thumbnail">
-                    {game.thumbnail.endsWith('.glb') ? (
-                      <ModelThumbnail modelPath={game.thumbnail} size={200} />
-                    ) : (
-                      <img src={game.thumbnail} alt={game.name} />
-                    )}
-                  </div>
-                  <div className="showcase-card-content">
-                    <h3>{game.name}</h3>
-                    <p className="showcase-card-author">por {game.author}</p>
-                    <p className="showcase-card-description">{game.description}</p>
-                    <div className="showcase-card-tags">
-                      {game.tags.map((tag) => (
-                        <span key={tag} className="showcase-tag">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </a>
-              ))}
+              {data.games.map(renderGameCard)}
             </div>
           ) : (
             <div className="showcase-empty">

@@ -209,24 +209,87 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .showcase-header {
+    padding: 3rem 1rem 2rem;
+  }
+
   .showcase-header h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+
+  .showcase-header p {
+    font-size: 0.95rem;
+  }
+
+  .showcase-content {
+    padding: 2rem 1rem;
   }
 
   .showcase-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .showcase-card-thumbnail {
+    aspect-ratio: 16/10;
+  }
+
+  .showcase-card-content {
+    padding: 1rem;
+  }
+
+  .showcase-card-content h3 {
+    font-size: 1.1rem;
+  }
+
+  .showcase-card-description {
+    font-size: 0.85rem;
   }
 
   .showcase-submit {
-    padding: 2rem 1.5rem;
+    padding: 2rem 1rem;
+  }
+
+  .showcase-submit h2 {
+    font-size: 1.5rem;
+  }
+
+  .showcase-submit > p {
+    font-size: 0.9rem;
   }
 
   .showcase-submit-steps {
     flex-direction: column;
     align-items: center;
+    gap: 1.5rem;
   }
 
   .submit-step {
     max-width: 100%;
+  }
+
+  .submit-step-number {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+  .submit-step h4 {
+    font-size: 0.9rem;
+  }
+
+  .submit-step p {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .showcase-card-tags {
+    gap: 0.35rem;
+  }
+
+  .showcase-tag {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
   }
 }
