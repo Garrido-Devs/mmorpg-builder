@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Navbar } from '@/components/shared'
@@ -241,9 +242,18 @@ export function Blog() {
         ) : (
           <>
             <div className="blog-header">
-              <h1>Features & Documentação</h1>
+              <h1>Features & Documentacao</h1>
               <p>Tutoriais, guias e novidades do MMORPG Builder</p>
             </div>
+
+            <Link to="/blog/quiz" className="blog-quiz-banner">
+              <div className="blog-quiz-banner-icon">🎯</div>
+              <div className="blog-quiz-banner-content">
+                <h3>Teste seus conhecimentos!</h3>
+                <p>Faca o quiz e descubra seu nivel no MMORPG Builder</p>
+              </div>
+              <span className="blog-quiz-banner-arrow">→</span>
+            </Link>
 
             <div className="blog-categories">
               {categories.map((cat) => (

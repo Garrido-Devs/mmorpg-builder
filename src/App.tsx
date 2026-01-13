@@ -9,6 +9,7 @@ import { Assets } from './pages/Assets'
 import { Showcase } from './pages/Showcase'
 import { Play } from './pages/Play'
 import { Blog } from './pages/Blog/Blog'
+import { Quiz } from './pages/Blog/Quiz'
 
 // Páginas de autenticação
 import { Login } from './pages/Auth/Login'
@@ -37,6 +38,7 @@ function App() {
         <Route path="/showcase" element={<Showcase />} />
         <Route path="/play" element={<Play />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/quiz" element={<Quiz />} />
 
         {/* Autenticação */}
         <Route path="/auth/login" element={<Login />} />

@@ -15,9 +15,10 @@ export function TeamDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user } = useAuthContext()
-  const { currentTeam, fetchTeam, getInviteLink, regenerateInvite, isLoading, error } = useTeam()
+  const { currentTeam, fetchTeam, getInviteLink, regenerateInvite, isLoading, error, clearError } = useTeam()
   const [invite, setInvite] = useState<InviteInfo | null>(null)
   const [inviteLoading, setInviteLoading] = useState(false)
+  const [inviteError, setInviteError] = useState<string | null>(null)
 
   useEffect(() => {
     if (id) {
@@ -27,23 +28,42 @@ export function TeamDetail() {
 
   const loadTeam = async () => {
     if (!id) return
-    await fetchTeam(id)
-    // Load invite link after team is loaded
-    const inviteData = await getInviteLink(id)
-    if (inviteData) {
-      setInvite(inviteData)
+    clearError()
+    const team = await fetchTeam(id)
+    if (!team) return
+
+    // Load invite link separately - don't let it affect team display
+    try {
+      setInviteLoading(true)
+      const inviteData = await getInviteLink(id)
+      if (inviteData) {
+        setInvite(inviteData)
+        setInviteError(null)
+      }
+      clearError() // Clear any error from getInviteLink
+    } catch {
+      setInviteError('Falha ao carregar link de convite')
+    } finally {
+      setInviteLoading(false)
     }
   }
 
   const handleRegenerateInvite = useCallback(async () => {
     if (!id) return
     setInviteLoading(true)
-    const newInvite = await regenerateInvite(id)
-    if (newInvite) {
-      setInvite(newInvite)
+    setInviteError(null)
+    try {
+      const newInvite = await regenerateInvite(id)
+      if (newInvite) {
+        setInvite(newInvite)
+      }
+      clearError()
+    } catch {
+      setInviteError('Falha ao regenerar link de convite')
+    } finally {
+      setInviteLoading(false)
     }
-    setInviteLoading(false)
-  }, [id, regenerateInvite])
+  }, [id, regenerateInvite, clearError])
 
   if (!id) {
     return null
@@ -111,11 +131,23 @@ export function TeamDetail() {
                 {isAdmin && (
                   <div className="team-detail-section">
                     <h2>Convidar Membros</h2>
-                    <InviteLink
-                      invite={invite}
-                      onRegenerate={handleRegenerateInvite}
-                      isLoading={inviteLoading}
-                    />
+                    {inviteError ? (
+                      <div className="invite-error">
+                        <p>{inviteError}</p>
+                        <button
+                          className="btn btn-secondary"
+                          onClick={() => loadTeam()}
+                        >
+                          Tentar novamente
+                        </button>
+                      </div>
+                    ) : (
+                      <InviteLink
+                        invite={invite}
+                        onRegenerate={handleRegenerateInvite}
+                        isLoading={inviteLoading}
+                      />
+                    )}
                   </div>
                 )}
 

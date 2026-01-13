@@ -290,3 +290,73 @@
 .blog-post-content td {
   color: rgba(255, 255, 255, 0.8);
 }
+
+/* Quiz Banner */
+.blog-quiz-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.15));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.blog-quiz-banner:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+}
+
+.blog-quiz-banner-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.blog-quiz-banner-content {
+  flex: 1;
+}
+
+.blog-quiz-banner-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 0.25rem 0;
+}
+
+.blog-quiz-banner-content p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.blog-quiz-banner-arrow {
+  font-size: 1.5rem;
+  color: #8b5cf6;
+  transition: transform 0.2s;
+}
+
+.blog-quiz-banner:hover .blog-quiz-banner-arrow {
+  transform: translateX(4px);
+}
+
+@media (max-width: 640px) {
+  .blog-quiz-banner {
+    padding: 1rem;
+  }
+
+  .blog-quiz-banner-icon {
+    font-size: 1.5rem;
+  }
+
+  .blog-quiz-banner-content h3 {
+    font-size: 1rem;
+  }
+
+  .blog-quiz-banner-content p {
+    font-size: 0.75rem;
+  }
+}
