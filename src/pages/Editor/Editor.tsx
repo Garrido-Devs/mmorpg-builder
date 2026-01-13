@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Game } from '@/components'
 import { InteractionPrompt } from '@/components/InteractionPrompt'
+import { GameHUD } from '@/components/game/hud'
 import { EditorLayout } from '@/components/editor'
 import { useGameEngine } from '@/hooks'
 import { useProject } from '@/hooks/useProject'
@@ -257,7 +258,12 @@ export function Editor() {
         projectLoading={projectLoading}
       >
         <Game />
-        {mode === 'play' && <InteractionPrompt />}
+        {mode === 'play' && (
+          <>
+            <GameHUD />
+            <InteractionPrompt />
+          </>
+        )}
       </EditorLayout>
     </>
   )

@@ -327,17 +327,17 @@ Cada item precisa ser validado manualmente.
 
 ## 11. HUD Estilo MMORPG (NOVO)
 
-> **Nota:** Existe codigo em `src/components/game/hud/` - precisa testar se funciona
+> **IMPLEMENTADO:** HUD aparece no Editor (modo Play) e na pagina /play
 
 ### 11.1 Barras de Status (PlayerFrame.tsx)
-- [ ] Barra de vida (HP) - *codigo existe*
-- [ ] Barra de mana/energia (MP) - *codigo existe*
+- [x] Barra de vida (HP)
+- [x] Barra de mana/energia (MP)
 - [ ] Barra de stamina
-- [ ] Barra de experiencia (XP) - *codigo existe*
-- [ ] Indicador de nivel - *codigo existe*
+- [x] Barra de experiencia (XP)
+- [x] Indicador de nivel
 
 ### 11.2 Mapa e Navegacao (Minimap.tsx)
-- [ ] Minimapa no canto da tela - *codigo existe*
+- [x] Minimapa no canto da tela
 - [ ] Mapa completo (M para abrir)
 - [ ] Icones de NPCs no mapa
 - [ ] Icones de quests no mapa
@@ -351,15 +351,15 @@ Cada item precisa ser validado manualmente.
 - [ ] Titulos/guildas dos jogadores
 
 ### 11.4 Target Frame (TargetFrame.tsx)
-- [ ] Selecao de alvo (click em NPC/inimigo) - *codigo existe*
-- [ ] Info do alvo (nome, nivel, vida) - *codigo existe*
-- [ ] Deselecionar alvo
+- [x] Selecao de alvo (click em NPC/inimigo)
+- [x] Info do alvo (nome, nivel, vida)
+- [x] Deselecionar alvo
 
 ### 11.5 Action Bar (ActionBar.tsx)
-- [ ] Barra de acoes/skills - *codigo existe*
-- [ ] Hotkeys (1-9)
+- [x] Barra de acoes/skills
+- [x] Hotkeys (1-9, 0)
 - [ ] Arrastar skills para barra
-- [ ] Cooldown visual
+- [x] Cooldown visual
 
 ### 11.6 Interface de Chat
 - [ ] Janela de chat
