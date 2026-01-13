@@ -327,17 +327,18 @@ Cada item precisa ser validado manualmente.
 
 ## 11. HUD Estilo MMORPG (NOVO)
 
-> **IMPLEMENTADO:** HUD aparece no Editor (modo Play) e na pagina /play
+> **STATUS:** DESABILITADO - Componentes visuais existem mas sao apenas mockup.
+> HUD sera reativado quando sistemas de jogo (combate, skills, inventario) forem implementados.
 
 ### 11.1 Barras de Status (PlayerFrame.tsx)
-- [x] Barra de vida (HP)
-- [x] Barra de mana/energia (MP)
+- [-] Barra de vida (HP) - VISUAL APENAS, nao conectado a sistema
+- [-] Barra de mana/energia (MP) - VISUAL APENAS
 - [ ] Barra de stamina
-- [x] Barra de experiencia (XP)
-- [x] Indicador de nivel
+- [-] Barra de experiencia (XP) - VISUAL APENAS
+- [-] Indicador de nivel - VISUAL APENAS
 
 ### 11.2 Mapa e Navegacao (Minimap.tsx)
-- [x] Minimapa no canto da tela
+- [-] Minimapa no canto da tela - VISUAL APENAS, nao mostra mapa real
 - [ ] Mapa completo (M para abrir)
 - [ ] Icones de NPCs no mapa
 - [ ] Icones de quests no mapa
@@ -557,7 +558,7 @@ Cada item precisa ser validado manualmente.
 4. Atualizar roadmap na landing page conforme realidade
 5. Remover features nao implementadas da landing page
 6. ~~Extrair rpg_sound_pack.zip para /public/assets/sounds/~~ FEITO
-7. ~~Implementar HUD estilo MMORPG~~ FEITO (basico)
+7. ~~Implementar HUD estilo MMORPG~~ MOCKUP VISUAL (desabilitado ate sistemas estarem prontos)
 8. **Implementar sistema de inventario robusto**
 9. **Implementar sistema de persistencia no banco**
 10. **Implementar sistema de publicacao de jogos**

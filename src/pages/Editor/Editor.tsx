@@ -260,7 +260,7 @@ export function Editor() {
         <Game />
         {mode === 'play' && (
           <>
-            <GameHUD />
+            {/* HUD removido temporariamente - sistemas de jogo ainda nao implementados */}
             <InteractionPrompt />
           </>
         )}

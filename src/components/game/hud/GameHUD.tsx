@@ -29,12 +29,13 @@ export interface TargetInfo {
 
 interface GameHUDProps {
   visible?: boolean
+  editorMode?: boolean
 }
 
 /**
  * GameHUD - Interface do jogador estilo MMORPG
  */
-export function GameHUD({ visible = true }: GameHUDProps) {
+export function GameHUD({ visible = true, editorMode = false }: GameHUDProps) {
   const [playerStats, setPlayerStats] = useState<PlayerStats>({
     name: 'Aventureiro',
     level: 1,
@@ -112,7 +113,7 @@ export function GameHUD({ visible = true }: GameHUDProps) {
   if (!visible) return null
 
   return (
-    <div className="game-hud">
+    <div className={`game-hud ${editorMode ? 'game-hud--editor' : ''}`}>
       {/* Canto superior esquerdo - Info do jogador */}
       <div className="hud-top-left">
         <PlayerFrame stats={playerStats} />

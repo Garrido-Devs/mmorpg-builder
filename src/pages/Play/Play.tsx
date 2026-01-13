@@ -38,7 +38,7 @@ export function Play() {
         </div>
         <div className="play-game">
           <Game />
-          <GameHUD />
+          {/* HUD removido temporariamente - sistemas de jogo ainda nao implementados */}
           <InteractionPrompt />
         </div>
         <div className="play-controls-hint">
