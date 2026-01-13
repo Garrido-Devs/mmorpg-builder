@@ -74,25 +74,36 @@ export class CollaboratorSystem {
     const group = new THREE.Group()
     const model = SkeletonUtils.clone(this.modelTemplate) as THREE.Group
 
-    // Configura sombras e cor
+    // Configura sombras e cor - forca material opaco
     model.traverse((child) => {
       if (child instanceof THREE.Mesh || child instanceof THREE.SkinnedMesh) {
         child.castShadow = true
         child.receiveShadow = true
 
-        // Funcao para configurar um material
-        const configureMaterial = (material: THREE.Material): THREE.Material => {
-          const mat = material.clone() as THREE.MeshStandardMaterial
-          // Garante que o material seja opaco (nao transparente)
-          mat.transparent = false
-          mat.opacity = 1
-          mat.depthWrite = true
-          mat.alphaTest = 0
-          // Adiciona brilho sutil com a cor do usuario
-          if ('emissive' in mat) {
-            mat.emissive = new THREE.Color(user.color)
-            mat.emissiveIntensity = 0.15
-          }
+        // Funcao para configurar um material - forca opacidade total
+        const configureMaterial = (material: THREE.Material): THREE.MeshStandardMaterial => {
+          const oldMat = material as THREE.MeshStandardMaterial
+
+          // Cria novo material copiando apenas propriedades visuais essenciais
+          const mat = new THREE.MeshStandardMaterial({
+            map: oldMat.map || null,
+            normalMap: oldMat.normalMap || null,
+            color: oldMat.color || new THREE.Color(0xffffff),
+            metalness: oldMat.metalness ?? 0,
+            roughness: oldMat.roughness ?? 1,
+            // Forca opacidade total
+            transparent: false,
+            opacity: 1,
+            depthWrite: true,
+            depthTest: true,
+            alphaTest: 0,
+            alphaToCoverage: false,
+            side: THREE.FrontSide,
+            // Cor do usuario como emissive
+            emissive: new THREE.Color(user.color),
+            emissiveIntensity: 0.1,
+          })
+
           mat.needsUpdate = true
           return mat
         }
