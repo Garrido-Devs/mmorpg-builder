@@ -4,7 +4,6 @@ import type { GameMode } from '../../types'
 import type { ProjectWithData } from '../../types/project'
 import type { CollaboratorInfo } from '../../types/collaboration'
 import { getEngine } from '../../engine'
-import { downloadMap, loadMapFromFile } from '../../utils'
 
 function formatLastSaved(date: Date | null | undefined): string {
   if (!date) return ''
@@ -22,7 +21,6 @@ interface EditorTopBarProps {
   activeUsers?: CollaboratorInfo[]
   isSaving?: boolean
   lastSaved?: Date | null
-  onSave?: () => Promise<void>
 }
 
 /**
@@ -35,30 +33,7 @@ export function EditorTopBar({
   activeUsers = [],
   isSaving,
   lastSaved,
-  onSave,
 }: EditorTopBarProps) {
-  const handleSaveMap = useCallback(async () => {
-    // Se tiver projeto, salva na nuvem
-    if (project && onSave) {
-      await onSave()
-    } else {
-      // Fallback: download local
-      const engine = getEngine()
-      const mapData = engine.getMapData()
-      downloadMap(mapData, `map_${Date.now()}.json`)
-    }
-  }, [project, onSave])
-
-  const handleLoadMap = useCallback(async () => {
-    try {
-      const mapData = await loadMapFromFile()
-      const engine = getEngine()
-      engine.loadMap(mapData)
-    } catch (error) {
-      console.error('Erro ao carregar mapa:', error)
-    }
-  }, [])
-
   const handleSetTool = useCallback((tool: 'translate' | 'rotate' | 'scale') => {
     const engine = getEngine()
     engine.editorSystem.setTransformMode(tool)
@@ -124,16 +99,7 @@ export function EditorTopBar({
             </button>
           </div>
 
-          <div className="editor-topbar-divider" />
-
-          {/* Ações de grid */}
-          <button className="editor-btn editor-btn-icon" title="Toggle Grid (G)">
-            ⊞
-          </button>
-          <button className="editor-btn editor-btn-icon" title="Snap to Grid">
-            ⌗
-          </button>
-        </div>
+          </div>
       )}
 
       {/* Usuários online */}
@@ -166,18 +132,6 @@ export function EditorTopBar({
 
       {/* Ações */}
       <div className="editor-topbar-actions">
-        {mode === 'editor' && (
-          <>
-            <button className="editor-btn" onClick={handleLoadMap}>
-              📂 Abrir
-            </button>
-            <button className="editor-btn" onClick={handleSaveMap} disabled={isSaving}>
-              💾 Salvar
-            </button>
-            <div className="editor-topbar-divider" />
-          </>
-        )}
-
         {/* Toggle modo */}
         <button
           className={`editor-btn ${mode === 'editor' ? 'editor-btn-primary' : ''}`}

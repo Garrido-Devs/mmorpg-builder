@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import type { ProjectWithData } from '../../types/project'
 
 // Build timestamp - atualizado em cada deploy (Campo Grande MS - AMT UTC-4)
-const BUILD_TIME = '13/01/2025 16:25 AMT'
+const BUILD_TIME = '13/01/2025 17:20 AMT'
 
 interface EditorStatusBarProps {
   project?: ProjectWithData | null
@@ -15,6 +15,11 @@ interface EditorStatusBarProps {
  */
 export function EditorStatusBar({ project, isConnected, pendingChanges = 0 }: EditorStatusBarProps) {
   const [fps, setFps] = useState(60)
+
+  // Debug: log quando isConnected muda
+  useEffect(() => {
+    console.log('[EditorStatusBar] isConnected:', isConnected, '| project:', project?.id)
+  }, [isConnected, project])
 
   // Atualiza FPS
   useEffect(() => {

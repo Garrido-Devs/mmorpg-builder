@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { GameMode } from '../../types'
 import type { ProjectWithData } from '../../types/project'
 import type { CollaborationState } from '../../types/collaboration'
@@ -23,7 +23,6 @@ interface EditorLayoutProps {
   collaboration?: CollaborationHook
   isSaving?: boolean
   lastSaved?: Date | null
-  onSave?: () => Promise<void>
   projectLoading?: boolean
 }
 
@@ -43,10 +42,14 @@ export function EditorLayout({
   collaboration,
   isSaving,
   lastSaved,
-  onSave,
 }: EditorLayoutProps) {
   const [sidebarWidth, setSidebarWidth] = useState(320)
   const activeUsers = collaboration?.activeUsers || []
+
+  // Debug: log quando collaboration muda
+  useEffect(() => {
+    console.log('[EditorLayout] collaboration.isConnected:', collaboration?.isConnected)
+  }, [collaboration?.isConnected])
 
   return (
     <div className="editor-root">
@@ -59,7 +62,6 @@ export function EditorLayout({
           activeUsers={activeUsers}
           isSaving={isSaving}
           lastSaved={lastSaved}
-          onSave={onSave}
         />
 
         {/* Área principal */}

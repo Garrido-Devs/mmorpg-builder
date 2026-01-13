@@ -41,6 +41,15 @@ export function Editor() {
     }
   }, [currentProject, updateProjectData])
 
+  // Debug: log estado de colaboração
+  useEffect(() => {
+    console.log('[Editor] collaboration state:', {
+      isConnected: collaboration.isConnected,
+      projectId: collaboration.projectId,
+      activeUsers: collaboration.activeUsers?.length || 0,
+    })
+  }, [collaboration.isConnected, collaboration.projectId, collaboration.activeUsers])
+
   // Load project and connect collaboration
   useEffect(() => {
     if (projectId) {
@@ -142,7 +151,6 @@ export function Editor() {
         collaboration={collaboration}
         isSaving={isSaving}
         lastSaved={lastSaved}
-        onSave={saveToCloud}
         projectLoading={projectLoading}
       >
         <Game />

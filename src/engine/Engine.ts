@@ -10,6 +10,7 @@ import { ComponentSystem } from '../systems/ComponentSystem'
 import { InteractionSystem } from '../systems/InteractionSystem'
 import { CollisionSystem } from '../systems/CollisionSystem'
 import { AISystem } from '../systems/AISystem'
+import { CollaboratorSystem } from '../systems/CollaboratorSystem'
 import type { GameMode, MapData, MapObjectData, AssetDefinition } from '../types'
 import { createDefaultMapSettings } from '../types'
 import { getAssetById } from '../assets'
@@ -36,6 +37,7 @@ export class Engine {
   public interactionSystem: InteractionSystem
   public collisionSystem: CollisionSystem
   public aiSystem: AISystem
+  public collaboratorSystem: CollaboratorSystem
 
   private renderer: THREE.WebGLRenderer | null = null
   private camera: THREE.PerspectiveCamera
@@ -68,6 +70,7 @@ export class Engine {
     this.interactionSystem = new InteractionSystem(this.gameScene.scene)
     this.collisionSystem = new CollisionSystem(this.gameScene.scene)
     this.aiSystem = new AISystem(this.gameScene.scene)
+    this.collaboratorSystem = new CollaboratorSystem(this.gameScene.scene)
 
     // Inicializa game loop
     this.gameLoop = new GameLoop()
@@ -129,6 +132,7 @@ export class Engine {
     this.editorSystem.destroy()
     this.componentSystem.destroy()
     this.interactionSystem.destroy()
+    this.collaboratorSystem.destroy()
     window.removeEventListener('resize', this.handleResize)
 
     if (this.renderer) {
@@ -179,6 +183,9 @@ export class Engine {
       // Sincroniza helpers de componentes
       this.componentSystem.syncHelpers()
     }
+
+    // Atualiza colaboradores (sempre)
+    this.collaboratorSystem.update(deltaTime)
 
     // Renderiza
     if (this.renderer) {
