@@ -106,9 +106,43 @@
   line-height: 1.5;
 }
 
+.blog-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.blog-card-read-time {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.blog-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .blog-card-date {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.3);
+}
+
+.blog-card-tags {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.blog-card-tag {
+  font-size: 0.625rem;
+  padding: 0.125rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* Blog Post */

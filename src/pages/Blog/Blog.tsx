@@ -10,34 +10,162 @@ interface BlogPost {
   description: string
   category: string
   date: string
-  file: string // nome do arquivo .md
+  file: string
+  readTime: string
+  tags: string[]
 }
 
-// Posts estáticos
+// Posts estáticos - 15 posts
 const BLOG_POSTS: BlogPost[] = [
+  {
+    id: 'getting-started',
+    title: 'Primeiros Passos',
+    description: 'Guia completo para iniciar seu primeiro projeto no MMORPG Builder',
+    category: 'Tutorial',
+    date: '2024-01-15',
+    file: 'getting-started.md',
+    readTime: '5 min',
+    tags: ['iniciante', 'setup', 'projeto'],
+  },
   {
     id: 'editor',
     title: 'Editor de Mapas',
     description: 'Aprenda como usar o editor de mapas e criar seu primeiro cenário',
     category: 'Tutorial',
-    date: '2024-01-13',
+    date: '2024-01-14',
     file: 'editor.md',
+    readTime: '8 min',
+    tags: ['editor', 'mapas', 'cenario'],
   },
   {
     id: 'components',
     title: 'Guia de Componentes',
     description: 'Entenda todos os componentes disponíveis para criar seu MMORPG',
     category: 'Documentação',
-    date: '2024-01-12',
+    date: '2024-01-13',
     file: 'components.md',
+    readTime: '10 min',
+    tags: ['componentes', 'referencia', 'api'],
+  },
+  {
+    id: 'ai-system',
+    title: 'Sistema de IA para NPCs',
+    description: 'Configure comportamentos inteligentes para seus NPCs usando o sistema de IA',
+    category: 'Tutorial',
+    date: '2024-01-12',
+    file: 'ai-system.md',
+    readTime: '12 min',
+    tags: ['ia', 'npc', 'comportamento', 'pathfinding'],
+  },
+  {
+    id: 'combat-system',
+    title: 'Configurando Combate',
+    description: 'Sistema completo de combate com skills, dano e efeitos',
+    category: 'Tutorial',
+    date: '2024-01-11',
+    file: 'combat-system.md',
+    readTime: '15 min',
+    tags: ['combate', 'skills', 'dano', 'pvp'],
+  },
+  {
+    id: 'crafting',
+    title: 'Resource Nodes e Crafting',
+    description: 'Crie sistemas de coleta de recursos e fabricacao de itens',
+    category: 'Tutorial',
+    date: '2024-01-10',
+    file: 'crafting.md',
+    readTime: '10 min',
+    tags: ['crafting', 'recursos', 'itens'],
+  },
+  {
+    id: 'skills-system',
+    title: 'Sistema de Skills',
+    description: 'Documentacao completa do sistema de habilidades e progressao',
+    category: 'Documentação',
+    date: '2024-01-09',
+    file: 'skills-system.md',
+    readTime: '8 min',
+    tags: ['skills', 'habilidades', 'progressao'],
+  },
+  {
+    id: 'quests',
+    title: 'Sistema de Quests',
+    description: 'Como criar missoes e objetivos para os jogadores',
+    category: 'Documentação',
+    date: '2024-01-08',
+    file: 'quests.md',
+    readTime: '12 min',
+    tags: ['quests', 'missoes', 'objetivos'],
+  },
+  {
+    id: 'portals',
+    title: 'Portais e Teleportes',
+    description: 'Configure portais para conectar diferentes mapas e areas',
+    category: 'Tutorial',
+    date: '2024-01-07',
+    file: 'portals.md',
+    readTime: '6 min',
+    tags: ['portais', 'teleporte', 'mapas'],
+  },
+  {
+    id: 'npcs-dialogs',
+    title: 'NPCs e Dialogos',
+    description: 'Crie NPCs interativos com sistemas de dialogo ramificado',
+    category: 'Tutorial',
+    date: '2024-01-06',
+    file: 'npcs-dialogs.md',
+    readTime: '10 min',
+    tags: ['npc', 'dialogo', 'interacao'],
   },
   {
     id: 'collaboration',
     title: 'Trabalhando em Equipe',
     description: 'Como colaborar em tempo real com outros desenvolvedores',
     category: 'Feature',
-    date: '2024-01-11',
+    date: '2024-01-05',
     file: 'collaboration.md',
+    readTime: '7 min',
+    tags: ['equipe', 'colaboracao', 'multiplayer'],
+  },
+  {
+    id: 'bank-system',
+    title: 'Sistema de Banco',
+    description: 'Implemente sistema de armazenamento compartilhado entre personagens',
+    category: 'Feature',
+    date: '2024-01-04',
+    file: 'bank-system.md',
+    readTime: '5 min',
+    tags: ['banco', 'inventario', 'storage'],
+  },
+  {
+    id: 'assets-guide',
+    title: 'Assets 3D Disponiveis',
+    description: 'Catalogo completo de modelos 3D incluidos no MMORPG Builder',
+    category: 'Documentação',
+    date: '2024-01-03',
+    file: 'assets-guide.md',
+    readTime: '6 min',
+    tags: ['assets', '3d', 'modelos'],
+  },
+  {
+    id: 'deploy',
+    title: 'Deploy na Vercel',
+    description: 'Publique seu jogo online de forma gratuita usando a Vercel',
+    category: 'Tutorial',
+    date: '2024-01-02',
+    file: 'deploy.md',
+    readTime: '8 min',
+    tags: ['deploy', 'vercel', 'publicar'],
+  },
+  {
+    id: 'faq',
+    title: 'FAQ - Perguntas Frequentes',
+    description: 'Respostas para as duvidas mais comuns sobre o MMORPG Builder',
+    category: 'Documentação',
+    date: '2024-01-01',
+    file: 'faq.md',
+    readTime: '5 min',
+    tags: ['faq', 'ajuda', 'suporte'],
   },
 ]
 
@@ -136,12 +264,22 @@ export function Blog() {
                   className="blog-card"
                   onClick={() => setSelectedPost(post)}
                 >
-                  <span className="blog-card-category">{post.category}</span>
+                  <div className="blog-card-header">
+                    <span className="blog-card-category">{post.category}</span>
+                    <span className="blog-card-read-time">{post.readTime}</span>
+                  </div>
                   <h2 className="blog-card-title">{post.title}</h2>
                   <p className="blog-card-description">{post.description}</p>
-                  <span className="blog-card-date">
-                    {new Date(post.date).toLocaleDateString('pt-BR')}
-                  </span>
+                  <div className="blog-card-footer">
+                    <span className="blog-card-date">
+                      {new Date(post.date).toLocaleDateString('pt-BR')}
+                    </span>
+                    <div className="blog-card-tags">
+                      {post.tags.slice(0, 2).map((tag) => (
+                        <span key={tag} className="blog-card-tag">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
                 </article>
               ))}
             </div>

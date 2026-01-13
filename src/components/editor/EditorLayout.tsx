@@ -1,15 +1,30 @@
 import { useState } from 'react'
 import type { GameMode } from '../../types'
+import type { ProjectWithData } from '../../types/project'
+import type { CollaborationState } from '../../types/collaboration'
 import { EditorTopBar } from './EditorTopBar'
 import { EditorSidebar } from './EditorSidebar'
 import { EditorStatusBar } from './EditorStatusBar'
 import '../../styles/editor.css'
 import '../../styles/game-editor.css'
 
+interface CollaborationHook extends CollaborationState {
+  connect: (projectId: string) => Promise<void>
+  disconnect: () => void
+  updateCursor: (position: { x: number; y: number; z: number }) => void
+  updateSelection: (elementId: string | null) => void
+}
+
 interface EditorLayoutProps {
   mode: GameMode
   onModeChange: (mode: GameMode) => void
   children: React.ReactNode
+  project?: ProjectWithData | null
+  collaboration?: CollaborationHook
+  isSaving?: boolean
+  lastSaved?: Date | null
+  onSave?: () => Promise<void>
+  projectLoading?: boolean
 }
 
 /**
@@ -20,14 +35,32 @@ interface EditorLayoutProps {
  * - Main: viewport (children) + sidebar direita
  * - StatusBar: informações de estado
  */
-export function EditorLayout({ mode, onModeChange, children }: EditorLayoutProps) {
+export function EditorLayout({
+  mode,
+  onModeChange,
+  children,
+  project,
+  collaboration,
+  isSaving,
+  lastSaved,
+  onSave,
+}: EditorLayoutProps) {
   const [sidebarWidth, setSidebarWidth] = useState(320)
+  const activeUsers = collaboration?.activeUsers || []
 
   return (
     <div className="editor-root">
       <div className="editor-layout">
         {/* Barra superior */}
-        <EditorTopBar mode={mode} onModeChange={onModeChange} />
+        <EditorTopBar
+          mode={mode}
+          onModeChange={onModeChange}
+          project={project}
+          activeUsers={activeUsers}
+          isSaving={isSaving}
+          lastSaved={lastSaved}
+          onSave={onSave}
+        />
 
         {/* Área principal */}
         <div className="editor-main">
@@ -43,7 +76,13 @@ export function EditorLayout({ mode, onModeChange, children }: EditorLayoutProps
         </div>
 
         {/* Barra de status */}
-        {mode === 'editor' && <EditorStatusBar />}
+        {mode === 'editor' && (
+          <EditorStatusBar
+            project={project}
+            isConnected={collaboration?.isConnected}
+            pendingChanges={collaboration?.pendingChanges || 0}
+          />
+        )}
       </div>
     </div>
   )

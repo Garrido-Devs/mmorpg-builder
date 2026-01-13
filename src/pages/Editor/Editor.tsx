@@ -1,16 +1,81 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { Game } from '@/components'
 import { InteractionPrompt } from '@/components/InteractionPrompt'
 import { EditorLayout } from '@/components/editor'
 import { useGameEngine } from '@/hooks'
+import { useProject } from '@/hooks/useProject'
+import { useCollaboration } from '@/hooks/useCollaboration'
 import { SEO } from '@/components/shared'
+import { getEngine } from '@/engine'
 
 const MIN_SCREEN_WIDTH = 1024
+const AUTO_SAVE_INTERVAL = 30000 // 30 segundos
 
 export function Editor() {
+  const { projectId } = useParams<{ projectId: string }>()
   const { mode, changeMode } = useGameEngine()
+  const { currentProject, fetchProject, updateProjectData, isLoading: projectLoading } = useProject()
+  const collaboration = useCollaboration()
   const [isMobile, setIsMobile] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const hasChangesRef = useRef(false)
+
+  // Auto-save function
+  const saveToCloud = useCallback(async () => {
+    if (!currentProject || !hasChangesRef.current) return
+
+    setIsSaving(true)
+    try {
+      const engine = getEngine()
+      const mapData = engine.getMapData()
+      await updateProjectData('scene', 'main', mapData)
+      setLastSaved(new Date())
+      hasChangesRef.current = false
+    } catch (error) {
+      console.error('Auto-save failed:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }, [currentProject, updateProjectData])
+
+  // Load project and connect collaboration
+  useEffect(() => {
+    if (projectId) {
+      fetchProject(projectId)
+      collaboration.connect(projectId)
+    }
+    return () => {
+      collaboration.disconnect()
+    }
+  }, [projectId])
+
+  // Listen for scene changes
+  useEffect(() => {
+    const handleSceneChange = () => {
+      hasChangesRef.current = true
+    }
+
+    window.addEventListener('scene-changed', handleSceneChange)
+    return () => window.removeEventListener('scene-changed', handleSceneChange)
+  }, [])
+
+  // Auto-save timer
+  useEffect(() => {
+    if (currentProject && mode === 'editor') {
+      autoSaveTimerRef.current = setInterval(() => {
+        saveToCloud()
+      }, AUTO_SAVE_INTERVAL)
+    }
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearInterval(autoSaveTimerRef.current)
+      }
+    }
+  }, [currentProject, mode, saveToCloud])
 
   // Check screen size
   useEffect(() => {
@@ -70,7 +135,16 @@ export function Editor() {
         title="Editor"
         description="Editor visual do MMORPG Builder. Crie e edite mundos 3D com ferramentas profissionais."
       />
-      <EditorLayout mode={mode} onModeChange={changeMode}>
+      <EditorLayout
+        mode={mode}
+        onModeChange={changeMode}
+        project={currentProject}
+        collaboration={collaboration}
+        isSaving={isSaving}
+        lastSaved={lastSaved}
+        onSave={saveToCloud}
+        projectLoading={projectLoading}
+      >
         <Game />
         {mode === 'play' && <InteractionPrompt />}
       </EditorLayout>

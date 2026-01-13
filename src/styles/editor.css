@@ -120,6 +120,84 @@
   gap: var(--editor-space-sm);
   font-weight: 600;
   color: var(--editor-accent);
+  text-decoration: none;
+  transition: opacity var(--editor-transition);
+}
+
+.editor-topbar-logo:hover {
+  opacity: 0.8;
+}
+
+/* Projeto atual */
+.editor-topbar-project {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-sm);
+}
+
+.editor-topbar-project-name {
+  font-weight: 500;
+  color: var(--editor-text-primary);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-topbar-saving {
+  font-size: 11px;
+  color: var(--editor-warning);
+  animation: pulse 1s infinite;
+}
+
+.editor-topbar-saved {
+  font-size: 11px;
+  color: var(--editor-success);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Usuários online */
+.editor-topbar-users {
+  display: flex;
+  align-items: center;
+  gap: -8px;
+}
+
+.editor-topbar-user {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--editor-bg-tertiary);
+  border: 2px solid var(--editor-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--editor-text-primary);
+  margin-left: -8px;
+  position: relative;
+}
+
+.editor-topbar-user:first-child {
+  margin-left: 0;
+}
+
+.editor-topbar-user img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editor-topbar-user-more {
+  background: var(--editor-bg-hover);
+  border-color: var(--editor-border);
+  font-size: 10px;
 }
 
 .editor-topbar-divider {
@@ -739,6 +817,12 @@
   display: flex;
   align-items: center;
   gap: var(--editor-space-xs);
+}
+
+.editor-statusbar-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
 .editor-statusbar-divider {

@@ -18,6 +18,7 @@ import { JoinTeam } from './pages/Auth/JoinTeam'
 // Páginas protegidas
 import { Dashboard } from './pages/Dashboard/Dashboard'
 import { Teams } from './pages/Teams/Teams'
+import { TeamDetail } from './pages/Teams/TeamDetail'
 import { Projects } from './pages/Projects/Projects'
 import { Editor } from './pages/Editor'
 
@@ -45,7 +46,7 @@ function App() {
         {/* Páginas protegidas */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/teams" element={<Teams />} />
-        <Route path="/teams/:id" element={<Teams />} />
+        <Route path="/teams/:id" element={<TeamDetail />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/editor" element={<Editor />} />
         <Route path="/editor/:projectId" element={<Editor />} />
