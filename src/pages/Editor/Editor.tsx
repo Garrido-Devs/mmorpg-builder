@@ -50,6 +50,14 @@ export function Editor() {
     })
   }, [collaboration.isConnected, collaboration.projectId, collaboration.activeUsers])
 
+  // Sincroniza colaboradores com o engine 3D
+  useEffect(() => {
+    if (collaboration.activeUsers && collaboration.activeUsers.length > 0) {
+      const engine = getEngine()
+      engine.collaboratorSystem.syncCollaborators(collaboration.activeUsers)
+    }
+  }, [collaboration.activeUsers])
+
   // Load project and connect collaboration
   useEffect(() => {
     if (projectId) {
