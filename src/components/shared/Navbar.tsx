@@ -25,6 +25,9 @@ export function Navbar() {
         <Link to="/assets" className={`navbar-link ${isActive('/assets') ? 'active' : ''}`}>
           Assets
         </Link>
+        <Link to="/showcase" className={`navbar-link ${isActive('/showcase') ? 'active' : ''}`}>
+          Showcase
+        </Link>
         <a
           href="https://github.com/Garrido-Devs/mmorpg-builder"
           target="_blank"

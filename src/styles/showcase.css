@@ -1,0 +1,232 @@
+/* ============================================
+   Showcase Page Styles
+   ============================================ */
+
+.showcase-page {
+  padding-top: 73px;
+  min-height: 100vh;
+}
+
+.showcase-header {
+  padding: 4rem 2rem 3rem;
+  text-align: center;
+  background: var(--landing-bg-secondary);
+  border-bottom: 1px solid var(--landing-border);
+}
+
+.showcase-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.showcase-header p {
+  color: var(--landing-text-secondary);
+  font-size: 1.1rem;
+}
+
+.showcase-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+/* Loading */
+.showcase-loading {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--landing-text-secondary);
+}
+
+.showcase-loading .model-thumbnail-spinner {
+  margin: 0 auto 1rem;
+}
+
+/* Grid */
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+
+.showcase-card {
+  background: var(--landing-bg-secondary);
+  border: 1px solid var(--landing-border);
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s;
+}
+
+.showcase-card:hover {
+  border-color: var(--landing-accent);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.showcase-card-thumbnail {
+  aspect-ratio: 16/9;
+  background: var(--landing-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.showcase-card-thumbnail img,
+.showcase-card-thumbnail .model-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcase-card-content {
+  padding: 1.25rem;
+}
+
+.showcase-card-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.showcase-card-author {
+  font-size: 0.85rem;
+  color: var(--landing-accent);
+  margin-bottom: 0.75rem;
+}
+
+.showcase-card-description {
+  font-size: 0.9rem;
+  color: var(--landing-text-secondary);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.showcase-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.showcase-tag {
+  padding: 0.2rem 0.6rem;
+  background: var(--landing-bg-tertiary);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--landing-text-secondary);
+}
+
+/* Empty State */
+.showcase-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--landing-bg-secondary);
+  border-radius: 16px;
+  margin-bottom: 3rem;
+}
+
+.showcase-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.showcase-empty h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.showcase-empty p {
+  color: var(--landing-text-secondary);
+}
+
+/* Submit Section */
+.showcase-submit {
+  background: var(--landing-bg-secondary);
+  border: 1px solid var(--landing-border);
+  border-radius: 16px;
+  padding: 3rem;
+  text-align: center;
+}
+
+.showcase-submit h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.showcase-submit > p {
+  color: var(--landing-text-secondary);
+  margin-bottom: 2rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.showcase-submit-steps {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.submit-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  text-align: left;
+  max-width: 220px;
+}
+
+.submit-step-number {
+  width: 32px;
+  height: 32px;
+  background: var(--landing-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.submit-step h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.submit-step p {
+  font-size: 0.85rem;
+  color: var(--landing-text-secondary);
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .showcase-header h1 {
+    font-size: 2rem;
+  }
+
+  .showcase-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .showcase-submit {
+    padding: 2rem 1.5rem;
+  }
+
+  .showcase-submit-steps {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .submit-step {
+    max-width: 100%;
+  }
+}

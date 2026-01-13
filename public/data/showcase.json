@@ -1,0 +1,15 @@
+{
+  "games": [
+    {
+      "id": "demo-village",
+      "name": "Demo Village",
+      "author": "MMORPG Builder Team",
+      "description": "Demonstracao do sistema com uma vila inicial, NPCs e sistema de combate.",
+      "url": "https://mmorpg-builder.vercel.app/editor",
+      "thumbnail": "/assets/models/characters/Knight.glb",
+      "tags": ["demo", "rpg", "fantasy"],
+      "createdAt": "2024-01-01"
+    }
+  ],
+  "submitUrl": "https://github.com/Garrido-Devs/mmorpg-builder/issues/new?template=showcase-submission.md&title=[Showcase]+Novo+Jogo"
+}
