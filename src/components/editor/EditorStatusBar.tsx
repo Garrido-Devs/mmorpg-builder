@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import type { ProjectWithData } from '../../types/project'
 
+// Build timestamp - atualizado em cada deploy
+const BUILD_TIME = '2025-01-13 17:15 BRT'
+
 interface EditorStatusBarProps {
   project?: ProjectWithData | null
   isConnected?: boolean
@@ -74,7 +77,11 @@ export function EditorStatusBar({ project, isConnected, pendingChanges = 0 }: Ed
       <div style={{ flex: 1 }} />
 
       <div className="editor-statusbar-item">
-        <span>MMORPG Editor v0.1.0</span>
+        <span>v0.1.0</span>
+      </div>
+      <div className="editor-statusbar-divider" />
+      <div className="editor-statusbar-item">
+        <span style={{ color: 'var(--editor-muted)', fontSize: '11px' }}>Build: {BUILD_TIME}</span>
       </div>
     </footer>
   )
