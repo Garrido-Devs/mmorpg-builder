@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import type { ProjectWithData } from '../../types/project'
 
-// Build timestamp - atualizado em cada deploy
-const BUILD_TIME = '2025-01-13 17:15 BRT'
+// Build timestamp - atualizado em cada deploy (Campo Grande MS - AMT UTC-4)
+const BUILD_TIME = '13/01/2025 16:25 AMT'
 
 interface EditorStatusBarProps {
   project?: ProjectWithData | null
