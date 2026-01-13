@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
 import type { CollaboratorInfo } from '../types/collaboration'
 
 const gltfLoader = new GLTFLoader()
@@ -69,20 +70,20 @@ export class CollaboratorSystem {
 
     console.log('[CollaboratorSystem] Adicionando colaborador:', user.name)
 
-    // Clona o modelo
+    // Clona o modelo usando SkeletonUtils para preservar skeleton/bones
     const group = new THREE.Group()
-    const model = this.modelTemplate.clone()
+    const model = SkeletonUtils.clone(this.modelTemplate) as THREE.Group
 
-    // Configura sombras
+    // Configura sombras e cor
     model.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
+      if (child instanceof THREE.Mesh || child instanceof THREE.SkinnedMesh) {
         child.castShadow = true
         child.receiveShadow = true
-        // Adiciona cor do usuario ao material
+        // Clona material e adiciona cor do usuario
         if (child.material) {
           const mat = (child.material as THREE.MeshStandardMaterial).clone()
           mat.emissive = new THREE.Color(user.color)
-          mat.emissiveIntensity = 0.3
+          mat.emissiveIntensity = 0.2
           child.material = mat
         }
       }
