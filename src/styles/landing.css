@@ -732,49 +732,17 @@
   font-size: 0.85rem;
 }
 
-.footer-credits a {
+.footer-credits a,
+.footer-copyright a {
   color: var(--landing-accent);
   text-decoration: none;
+  transition: color 0.2s;
 }
 
-.footer-author {
-  max-width: 1200px;
-  margin: 2rem auto 0;
-  padding-top: 2rem;
-  border-top: 1px solid var(--landing-border);
-  text-align: center;
-}
-
-.footer-author p {
-  color: var(--landing-text-secondary);
-  margin-bottom: 0.5rem;
-}
-
-.footer-author strong {
-  color: var(--landing-text);
-}
-
-.footer-whatsapp {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: #25D366;
-  color: white;
-  text-decoration: none;
-  border-radius: 999px;
-  font-weight: 500;
-  transition: all 0.3s;
-  margin-top: 0.5rem;
-}
-
-.footer-whatsapp:hover {
-  background: #128C7E;
-  transform: scale(1.05);
-}
-
-.whatsapp-icon {
-  font-size: 1.2rem;
+.footer-credits a:hover,
+.footer-copyright a:hover {
+  color: var(--landing-accent-glow);
+  text-decoration: underline;
 }
 
 /* ============================================

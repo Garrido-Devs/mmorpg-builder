@@ -363,30 +363,29 @@ export function Landing() {
 
         <div className="footer-bottom">
           <p className="footer-copyright">
-            MIT License - Use como quiser!
+            MIT License | Criado por{' '}
+            <a
+              href="https://wa.me/5567993109148"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Emerson Garrido
+            </a>
           </p>
           <p className="footer-credits">
-            Assets 3D por{' '}
+            Assets por{' '}
             <a href="https://kaylousberg.itch.io/" target="_blank" rel="noopener noreferrer">
               KayKit
             </a>
-            {' '}(CC0)
+            {' '}(CC0) |{' '}
+            <a
+              href="https://github.com/Garrido-Devs/mmorpg-builder"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
           </p>
-        </div>
-
-        <div className="footer-author">
-          <p>
-            Desenvolvido por <strong>Emerson Garrido</strong>
-          </p>
-          <a
-            href="https://wa.me/5567993109148"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="footer-whatsapp"
-          >
-            <span className="whatsapp-icon">📱</span>
-            WhatsApp: (67) 99310-9148
-          </a>
         </div>
       </footer>
     </div>
