@@ -42,8 +42,11 @@ export function useCollaboration() {
 
   // Conectar ao projeto
   const connect = useCallback(async (projectId: string) => {
+    console.log('[Collaboration] Iniciando conexão para projeto:', projectId)
+
     // Desconectar se já estiver conectado
     if (pusherRef.current) {
+      console.log('[Collaboration] Desconectando conexão anterior')
       pusherRef.current.disconnect()
     }
 
@@ -53,16 +56,24 @@ export function useCollaboration() {
       try {
         const user = JSON.parse(userStr)
         currentUserIdRef.current = user.id
-      } catch {}
+        console.log('[Collaboration] User ID:', user.id)
+      } catch (e) {
+        console.error('[Collaboration] Erro ao parsear auth_user:', e)
+      }
+    } else {
+      console.warn('[Collaboration] auth_user não encontrado no localStorage')
     }
 
     // Inicializar Pusher
     const pusherKey = import.meta.env.VITE_PUSHER_KEY
+    console.log('[Collaboration] VITE_PUSHER_KEY:', pusherKey ? 'configurado' : 'NÃO CONFIGURADO')
+
     if (!pusherKey) {
-      console.warn('Pusher key not configured - collaboration disabled')
+      console.warn('[Collaboration] Pusher key not configured - collaboration disabled')
       return
     }
 
+    console.log('[Collaboration] Criando conexão Pusher...')
     pusherRef.current = new Pusher(pusherKey, {
       cluster: import.meta.env.VITE_PUSHER_CLUSTER || 'us2',
       authEndpoint: '/api/realtime/auth',
@@ -73,8 +84,21 @@ export function useCollaboration() {
       },
     })
 
+    // Log de eventos do Pusher
+    pusherRef.current.connection.bind('connected', () => {
+      console.log('[Collaboration] Pusher CONECTADO!')
+    })
+    pusherRef.current.connection.bind('error', (err: unknown) => {
+      console.error('[Collaboration] Pusher ERRO:', err)
+    })
+    pusherRef.current.connection.bind('disconnected', () => {
+      console.warn('[Collaboration] Pusher DESCONECTADO')
+    })
+
     // Inscrever no canal do projeto
-    channelRef.current = pusherRef.current.subscribe(`project-${projectId}`)
+    const channelName = `project-${projectId}`
+    console.log('[Collaboration] Inscrevendo no canal:', channelName)
+    channelRef.current = pusherRef.current.subscribe(channelName)
 
     // Handlers de eventos
     channelRef.current.bind('user-joined', (data: PusherUserJoinedEvent) => {
@@ -135,10 +159,25 @@ export function useCollaboration() {
     })
 
     // Notificar servidor que entrou
-    await realtimeApi.sync({ projectId, action: 'join' })
+    console.log('[Collaboration] Notificando servidor (sync join)...')
+    try {
+      await realtimeApi.sync({ projectId, action: 'join' })
+      console.log('[Collaboration] Sync join OK')
+    } catch (err) {
+      console.error('[Collaboration] Sync join ERRO:', err)
+      return
+    }
 
     // Buscar usuários ativos
-    const presence = await realtimeApi.presence(projectId)
+    console.log('[Collaboration] Buscando usuários ativos...')
+    let presence
+    try {
+      presence = await realtimeApi.presence(projectId)
+      console.log('[Collaboration] Presence OK:', presence)
+    } catch (err) {
+      console.error('[Collaboration] Presence ERRO:', err)
+      return
+    }
     const users = (presence.users as Array<{
       id: string
       name: string
@@ -152,6 +191,7 @@ export function useCollaboration() {
       lastSeen: new Date().toISOString(),
     }))
 
+    console.log('[Collaboration] Definindo estado como CONECTADO com', users.length, 'usuários')
     setState({
       isConnected: true,
       projectId,
@@ -159,6 +199,7 @@ export function useCollaboration() {
       pendingChanges: 0,
       lastSyncAt: new Date().toISOString(),
     })
+    console.log('[Collaboration] Conexão estabelecida com sucesso!')
 
     // Ping periódico para manter sessão ativa
     pingIntervalRef.current = setInterval(() => {
