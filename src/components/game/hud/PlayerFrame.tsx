@@ -10,6 +10,7 @@ interface PlayerFrameProps {
 export function PlayerFrame({ stats }: PlayerFrameProps) {
   const healthPercent = (stats.health / stats.maxHealth) * 100
   const manaPercent = (stats.mana / stats.maxMana) * 100
+  const staminaPercent = ((stats.stamina || 100) / (stats.maxStamina || 100)) * 100
   const expPercent = (stats.experience / stats.experienceToLevel) * 100
 
   return (
@@ -48,11 +49,22 @@ export function PlayerFrame({ stats }: PlayerFrameProps) {
             style={{ width: `${manaPercent}%` }}
           />
           <span className="player-frame-bar-text">
-            {stats.mana} / {stats.maxMana}
+            {Math.round(stats.mana)} / {stats.maxMana}
           </span>
         </div>
 
-        {/* Barra de XP */}
+        {/* Barra de Stamina */}
+        <div className="player-frame-bar stamina-bar">
+          <div
+            className="player-frame-bar-fill stamina-fill"
+            style={{ width: `${staminaPercent}%` }}
+          />
+          <span className="player-frame-bar-text">
+            ST: {Math.round(stats.stamina || 100)} / {stats.maxStamina || 100}
+          </span>
+        </div>
+
+        {/* Barra de XP (menor) */}
         <div className="player-frame-bar exp-bar">
           <div
             className="player-frame-bar-fill exp-fill"

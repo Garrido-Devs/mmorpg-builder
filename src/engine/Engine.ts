@@ -11,6 +11,7 @@ import { InteractionSystem } from '../systems/InteractionSystem'
 import { CollisionSystem } from '../systems/CollisionSystem'
 import { AISystem } from '../systems/AISystem'
 import { CollaboratorSystem } from '../systems/CollaboratorSystem'
+import { CombatSystem } from '../systems/CombatSystem'
 import type { GameMode, MapData, MapObjectData, AssetDefinition } from '../types'
 import { createDefaultMapSettings } from '../types'
 import { getAssetById } from '../assets'
@@ -38,6 +39,7 @@ export class Engine {
   public collisionSystem: CollisionSystem
   public aiSystem: AISystem
   public collaboratorSystem: CollaboratorSystem
+  public combatSystem: CombatSystem
 
   private renderer: THREE.WebGLRenderer | null = null
   private camera: THREE.PerspectiveCamera
@@ -74,9 +76,50 @@ export class Engine {
     this.collisionSystem = new CollisionSystem(this.gameScene.scene)
     this.aiSystem = new AISystem(this.gameScene.scene)
     this.collaboratorSystem = new CollaboratorSystem(this.gameScene.scene)
+    this.combatSystem = new CombatSystem(this.gameScene.scene)
 
     // Conecta collision system ao collaborator system para colisão entre players
     this.collaboratorSystem.setCollisionSystem(this.collisionSystem)
+
+    // Conecta AI system ao combat system
+    this.aiSystem.setCombatSystem(this.combatSystem)
+
+    // Conecta combat system ao player
+    this.combatSystem.setPlayer({
+      id: 'player',
+      mesh: this.player.mesh,
+      health: this.player.health,
+      maxHealth: this.player.maxHealth,
+      mana: this.player.mana,
+      maxMana: this.player.maxMana,
+      damage: this.player.damage,
+      defense: this.player.defense,
+      isDead: this.player.getIsDead(),
+      takeDamage: (amount: number) => this.player.takeDamage(amount),
+      heal: (amount: number) => this.player.heal(amount),
+    })
+
+    // Conecta input de ataque ao combat system
+    this.inputSystem.onAttack(() => {
+      if (this.mode === 'play') {
+        this.combatSystem.playerAttack()
+        this.player.attack()
+      }
+    })
+
+    // Conecta input de skill ao combat system
+    this.inputSystem.onSkill((skillIndex: number) => {
+      if (this.mode === 'play') {
+        this.combatSystem.useSkill(skillIndex)
+      }
+    })
+
+    // Conecta input de pulo ao player
+    this.inputSystem.onJump(() => {
+      if (this.mode === 'play') {
+        this.player.jump()
+      }
+    })
 
     // Inicializa game loop
     this.gameLoop = new GameLoop()
@@ -139,6 +182,7 @@ export class Engine {
     this.componentSystem.destroy()
     this.interactionSystem.destroy()
     this.collaboratorSystem.destroy()
+    this.combatSystem.destroy()
     window.removeEventListener('resize', this.handleResize)
 
     if (this.renderer) {
@@ -173,6 +217,9 @@ export class Engine {
 
       // Atualiza sistema de IA
       this.aiSystem.update(deltaTime, this.player.mesh.position)
+
+      // Atualiza sistema de combate
+      this.combatSystem.update(deltaTime)
 
       // Notifica mudança de posição do player (throttled)
       this.playerMoveThrottle += deltaTime

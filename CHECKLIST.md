@@ -325,42 +325,98 @@ Cada item precisa ser validado manualmente.
 
 ---
 
-## 11. HUD Estilo MMORPG (NOVO)
+## 11. Sistema de Combate (PRIORIDADE)
 
-> **STATUS:** DESABILITADO - Componentes visuais existem mas sao apenas mockup.
-> HUD sera reativado quando sistemas de jogo (combate, skills, inventario) forem implementados.
+> **EM DESENVOLVIMENTO** - Sistema core de gameplay
 
-### 11.1 Barras de Status (PlayerFrame.tsx)
-- [-] Barra de vida (HP) - VISUAL APENAS, nao conectado a sistema
-- [-] Barra de mana/energia (MP) - VISUAL APENAS
-- [ ] Barra de stamina
-- [-] Barra de experiencia (XP) - VISUAL APENAS
-- [-] Indicador de nivel - VISUAL APENAS
+### 11.1 Stats do Jogador
+- [ ] HP (vida) - valor real que muda
+- [ ] MP (mana) - valor real que muda
+- [ ] Stamina - para pular/correr
+- [ ] Dano base
+- [ ] Defesa/Armadura
+- [ ] Velocidade de ataque
+- [ ] Nivel e XP funcional
 
-### 11.2 Mapa e Navegacao (Minimap.tsx)
-- [-] Minimapa no canto da tela - VISUAL APENAS, nao mostra mapa real
+### 11.2 Movimento do Jogador
+- [x] WASD - mover
+- [x] Mouse - camera
+- [ ] Espaco - pular
+- [ ] Shift - correr (gasta stamina)
+- [ ] Colisao com terreno/objetos
+
+### 11.3 Combate Basico
+- [ ] Click esquerdo / Espaco - ataque basico
+- [ ] Animacao de ataque
+- [ ] Hitbox de ataque
+- [ ] Calcular dano vs defesa do alvo
+- [ ] Numeros de dano flutuantes
+- [ ] Cooldown entre ataques
+
+### 11.4 Sistema de Monstros/Inimigos
+- [ ] Monstros com HP real
+- [ ] Monstros recebem dano e morrem
+- [ ] IA basica - seguir jogador
+- [ ] IA basica - atacar jogador
+- [ ] Respawn de monstros
+- [ ] Loot ao matar (futuro)
+
+### 11.5 PvP (Jogador vs Jogador)
+- [ ] Atacar outros jogadores
+- [ ] Dano entre jogadores
+- [ ] Flag PvP (opcional)
+
+### 11.6 Habilidades/Poderes
+- [ ] Skill 1 - Ataque forte (mais dano, mais cooldown)
+- [ ] Skill 2 - Bola de fogo (dano a distancia)
+- [ ] Skill 3 - Cura (recupera HP)
+- [ ] Skill 4 - Buff de velocidade
+- [ ] Sistema de cooldown real
+- [ ] Consumo de mana
+
+### 11.7 Audio de Combate
+- [ ] Som ao atacar
+- [ ] Som ao receber dano
+- [ ] Som ao morrer
+- [ ] Som das habilidades
+- [ ] Som dos monstros
+
+---
+
+## 12. HUD Funcional (PRIORIDADE)
+
+> **REATIVAR** apos sistema de combate implementado
+
+### 12.1 Barras de Status (PlayerFrame.tsx)
+- [ ] Barra de vida (HP) - conectada ao sistema real
+- [ ] Barra de mana (MP) - conectada ao sistema real
+- [ ] Barra de stamina - conectada ao sistema real
+- [ ] Barra de XP - conectada ao sistema real
+- [ ] Nivel do jogador - conectado ao sistema real
+
+### 12.2 Mapa e Navegacao (Minimap.tsx)
+- [ ] Minimapa mostrando terreno real
+- [ ] Posicao do jogador no mapa
+- [ ] Posicao de monstros no mapa
+- [ ] Posicao de outros jogadores no mapa
 - [ ] Mapa completo (M para abrir)
-- [ ] Icones de NPCs no mapa
-- [ ] Icones de quests no mapa
-- [ ] Waypoints/marcadores
 
-### 11.3 Nomes e Indicadores
+### 12.3 Nomes e Indicadores
 - [ ] Nome em cima dos personagens (jogadores)
 - [ ] Nome em cima dos NPCs
 - [ ] Barra de vida em cima dos inimigos
 - [ ] Indicadores de nivel dos NPCs
-- [ ] Titulos/guildas dos jogadores
 
-### 11.4 Target Frame (TargetFrame.tsx)
-- [x] Selecao de alvo (click em NPC/inimigo)
-- [x] Info do alvo (nome, nivel, vida)
-- [x] Deselecionar alvo
+### 12.4 Target Frame (TargetFrame.tsx)
+- [ ] Selecao de alvo (click em NPC/inimigo)
+- [ ] HP real do alvo
+- [ ] Atualiza quando alvo toma dano
 
-### 11.5 Action Bar (ActionBar.tsx)
-- [x] Barra de acoes/skills
-- [x] Hotkeys (1-9, 0)
-- [ ] Arrastar skills para barra
-- [x] Cooldown visual
+### 12.5 Action Bar Funcional (ActionBar.tsx)
+- [ ] Skills conectadas ao sistema de combate
+- [ ] Hotkeys funcionais (1-9, 0)
+- [ ] Cooldown real das skills
+- [ ] Feedback visual ao usar skill
 
 ### 11.6 Interface de Chat
 - [ ] Janela de chat

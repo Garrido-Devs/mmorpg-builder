@@ -176,8 +176,12 @@ export interface InputState {
   backward: boolean
   left: boolean
   right: boolean
+  jump: boolean
+  sprint: boolean
+  attack: boolean
   mouseDown: boolean
   mousePosition: { x: number; y: number }
+  skillKeys: boolean[]
 }
 
 // ============================================

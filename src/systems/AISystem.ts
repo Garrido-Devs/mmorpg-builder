@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { AudioManager } from '../audio/AudioManager'
 import type { NPCComponent, Component } from '../types'
+import type { CombatSystem, Combatant } from './CombatSystem'
 
 // Estados de IA
 type AIState = 'idle' | 'patrol' | 'chase' | 'attack' | 'return' | 'dead'
@@ -44,19 +46,31 @@ export class AISystem {
   private scene: THREE.Scene
   private managedNPCs: Map<string, ManagedNPC> = new Map()
   private playerPosition: THREE.Vector3 = new THREE.Vector3()
+  private combatSystem: CombatSystem | null = null
 
   // Configurações
   private detectionRange = 8
   private attackRange = 1.5
   private moveSpeed = 2
   private attackCooldown = 1.5 // segundos
+  private baseDamage = 10
 
   // Zona segura (monstros não entram)
   private safeZoneCenter = new THREE.Vector3(0, 0, 0)
   private safeZoneRadius = 12 // raio da área segura
 
+  // Callbacks
+  private onNPCDeathCallbacks: Set<(npcId: string) => void> = new Set()
+
   constructor(scene: THREE.Scene) {
     this.scene = scene
+  }
+
+  /**
+   * Conecta o CombatSystem
+   */
+  public setCombatSystem(combatSystem: CombatSystem): void {
+    this.combatSystem = combatSystem
   }
 
   /**
@@ -99,11 +113,115 @@ export class AISystem {
     // Iniciar com idle
     this.playAnimation(managed, 'Idle')
 
+    // Registra no combat system se for hostil
+    if (this.combatSystem && npcComponent.attitude === 'hostile') {
+      const combatant: Combatant = {
+        id: entityId,
+        mesh: object,
+        health: managed.health,
+        maxHealth: managed.maxHealth,
+        damage: this.baseDamage,
+        defense: 0,
+        isDead: false,
+        takeDamage: (amount: number) => this.damageNPC(entityId, amount),
+      }
+      this.combatSystem.registerEnemy(combatant)
+    }
+
     console.log(`NPC registrado: ${entityId}`)
     console.log(`  - Attitude: ${npcComponent.attitude}`)
     console.log(`  - Behavior: ${npcComponent.behavior}`)
     console.log(`  - PatrolRadius: ${npcComponent.patrolRadius}`)
     console.log(`  - AssetPath: ${managed.object.userData.assetPath}`)
+  }
+
+  /**
+   * Aplica dano a um NPC
+   */
+  public damageNPC(npcId: string, damage: number): void {
+    const managed = this.managedNPCs.get(npcId)
+    if (!managed || managed.state === 'dead') return
+
+    managed.health -= damage
+
+    // Som de dano
+    AudioManager.playFromGroup('slime')
+
+    console.log(`[AI] ${npcId} recebeu ${damage} de dano (HP: ${managed.health}/${managed.maxHealth})`)
+
+    if (managed.health <= 0) {
+      managed.health = 0
+      this.killNPC(npcId)
+    }
+  }
+
+  /**
+   * Mata um NPC
+   */
+  private killNPC(npcId: string): void {
+    const managed = this.managedNPCs.get(npcId)
+    if (!managed) return
+
+    this.setState(managed, 'dead')
+    managed.object.userData.isDead = true
+
+    // Remove do combat system
+    if (this.combatSystem) {
+      this.combatSystem.unregisterEnemy(npcId)
+    }
+
+    // Notifica callbacks
+    this.onNPCDeathCallbacks.forEach(cb => cb(npcId))
+
+    console.log(`[AI] ${npcId} morreu!`)
+
+    // Respawn apos 10 segundos
+    setTimeout(() => {
+      this.respawnNPC(npcId)
+    }, 10000)
+  }
+
+  /**
+   * Respawn de um NPC
+   */
+  private respawnNPC(npcId: string): void {
+    const managed = this.managedNPCs.get(npcId)
+    if (!managed) return
+
+    // Reset stats
+    managed.health = managed.maxHealth
+    managed.object.userData.isDead = false
+
+    // Volta para posicao inicial
+    managed.object.position.copy(managed.startPosition)
+
+    // Reset estado
+    this.setState(managed, 'idle')
+
+    // Registra novamente no combat system
+    if (this.combatSystem && managed.component.attitude === 'hostile') {
+      const combatant: Combatant = {
+        id: npcId,
+        mesh: managed.object,
+        health: managed.health,
+        maxHealth: managed.maxHealth,
+        damage: this.baseDamage,
+        defense: 0,
+        isDead: false,
+        takeDamage: (amount: number) => this.damageNPC(npcId, amount),
+      }
+      this.combatSystem.registerEnemy(combatant)
+    }
+
+    console.log(`[AI] ${npcId} respawnou!`)
+  }
+
+  /**
+   * Callback para morte de NPC
+   */
+  public onNPCDeath(callback: (npcId: string) => void): () => void {
+    this.onNPCDeathCallbacks.add(callback)
+    return () => this.onNPCDeathCallbacks.delete(callback)
   }
 
   /**
@@ -531,8 +649,15 @@ export class AISystem {
       // Tocar animação de ataque
       this.playAnimation(managed, 'Attack')
 
-      // TODO: Causar dano ao player
-      console.log(`${managed.object.userData.entityName} atacou!`)
+      // Causar dano ao player
+      if (this.combatSystem) {
+        this.combatSystem.damagePlayer(this.baseDamage, managed.object.userData.entityId)
+      }
+
+      // Som de ataque
+      AudioManager.playFromGroup('attack')
+
+      console.log(`[AI] ${managed.object.userData.entityName} atacou o player!`)
     }
   }
 

@@ -13,6 +13,8 @@ export interface PlayerStats {
   maxHealth: number
   mana: number
   maxMana: number
+  stamina: number
+  maxStamina: number
   experience: number
   experienceToLevel: number
   avatarUrl?: string
@@ -27,6 +29,15 @@ export interface TargetInfo {
   type: 'enemy' | 'npc' | 'player'
 }
 
+export interface SkillInfo {
+  id: string
+  name: string
+  icon: string
+  cooldown: number
+  maxCooldown: number
+  isReady: boolean
+}
+
 interface GameHUDProps {
   visible?: boolean
   editorMode?: boolean
@@ -34,6 +45,7 @@ interface GameHUDProps {
 
 /**
  * GameHUD - Interface do jogador estilo MMORPG
+ * Conectado aos sistemas reais do engine
  */
 export function GameHUD({ visible = true, editorMode = false }: GameHUDProps) {
   const [playerStats, setPlayerStats] = useState<PlayerStats>({
@@ -43,15 +55,22 @@ export function GameHUD({ visible = true, editorMode = false }: GameHUDProps) {
     maxHealth: 100,
     mana: 50,
     maxMana: 50,
+    stamina: 100,
+    maxStamina: 100,
     experience: 0,
     experienceToLevel: 100,
   })
 
   const [target, setTarget] = useState<TargetInfo | null>(null)
   const [playerPosition, setPlayerPosition] = useState({ x: 0, z: 0 })
+  const [skills, setSkills] = useState<SkillInfo[]>([])
 
-  // Carrega dados do usuario logado
+  // Conecta aos stats reais do player
   useEffect(() => {
+    const engine = getEngine()
+    const player = engine.player
+
+    // Carrega nome do usuario
     const userStr = localStorage.getItem('auth_user')
     if (userStr) {
       try {
@@ -65,18 +84,56 @@ export function GameHUD({ visible = true, editorMode = false }: GameHUDProps) {
         console.error('Erro ao carregar usuario:', e)
       }
     }
-  }, [])
 
-  // Escuta posicao do player para o minimap
-  useEffect(() => {
-    const engine = getEngine()
-    const unsubscribe = engine.onPlayerMove((pos) => {
+    // Escuta mudancas de HP
+    const unsubHealth = player.onHealthChange((health, maxHealth) => {
+      setPlayerStats(prev => ({ ...prev, health, maxHealth }))
+    })
+
+    // Escuta mudancas de Mana
+    const unsubMana = player.onManaChange((mana, maxMana) => {
+      setPlayerStats(prev => ({ ...prev, mana, maxMana }))
+    })
+
+    // Escuta mudancas de Stamina
+    const unsubStamina = player.onStaminaChange((stamina, maxStamina) => {
+      setPlayerStats(prev => ({ ...prev, stamina, maxStamina }))
+    })
+
+    // Escuta posicao
+    const unsubPosition = engine.onPlayerMove((pos) => {
       setPlayerPosition({ x: pos.x, z: pos.z })
     })
-    return unsubscribe
+
+    // Carrega skills do combat system
+    const combatSystem = engine.combatSystem
+    const skillStates = combatSystem.getSkillStates()
+    setSkills(skillStates.map(s => ({
+      id: s.skill.id,
+      name: s.skill.name,
+      icon: s.skill.icon,
+      cooldown: s.currentCooldown,
+      maxCooldown: s.skill.cooldown,
+      isReady: s.isReady,
+    })))
+
+    // Escuta cooldowns de skills
+    const unsubCooldown = combatSystem.onSkillCooldown((index, cooldown, maxCooldown) => {
+      setSkills(prev => prev.map((s, i) =>
+        i === index ? { ...s, cooldown, maxCooldown, isReady: cooldown <= 0 } : s
+      ))
+    })
+
+    return () => {
+      unsubHealth()
+      unsubMana()
+      unsubStamina()
+      unsubPosition()
+      unsubCooldown()
+    }
   }, [])
 
-  // Escuta selecao de alvo
+  // Escuta selecao de alvo (via eventos)
   useEffect(() => {
     const handleTargetSelect = (event: CustomEvent<TargetInfo | null>) => {
       setTarget(event.detail)
@@ -84,30 +141,6 @@ export function GameHUD({ visible = true, editorMode = false }: GameHUDProps) {
 
     window.addEventListener('target-selected', handleTargetSelect as EventListener)
     return () => window.removeEventListener('target-selected', handleTargetSelect as EventListener)
-  }, [])
-
-  // Escuta dano recebido/curado
-  useEffect(() => {
-    const handlePlayerDamage = (event: CustomEvent<{ amount: number }>) => {
-      setPlayerStats(prev => ({
-        ...prev,
-        health: Math.max(0, prev.health - event.detail.amount),
-      }))
-    }
-
-    const handlePlayerHeal = (event: CustomEvent<{ amount: number }>) => {
-      setPlayerStats(prev => ({
-        ...prev,
-        health: Math.min(prev.maxHealth, prev.health + event.detail.amount),
-      }))
-    }
-
-    window.addEventListener('player-damage', handlePlayerDamage as EventListener)
-    window.addEventListener('player-heal', handlePlayerHeal as EventListener)
-    return () => {
-      window.removeEventListener('player-damage', handlePlayerDamage as EventListener)
-      window.removeEventListener('player-heal', handlePlayerHeal as EventListener)
-    }
   }, [])
 
   if (!visible) return null
@@ -133,7 +166,7 @@ export function GameHUD({ visible = true, editorMode = false }: GameHUDProps) {
 
       {/* Centro inferior - Barra de acoes */}
       <div className="hud-bottom-center">
-        <ActionBar />
+        <ActionBar skills={skills} />
       </div>
     </div>
   )

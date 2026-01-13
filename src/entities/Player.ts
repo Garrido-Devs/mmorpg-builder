@@ -40,15 +40,34 @@ export class Player extends Entity {
   // Stats de combate
   public health = 100
   public maxHealth = 100
+  public mana = 50
+  public maxMana = 50
+  public stamina = 100
+  public maxStamina = 100
   public damage = 15
+  public defense = 5
   public attackRange = 2
   public attackCooldown = 0.8 // segundos
   private lastAttackTime = 0
   private isDead = false
 
+  // Sistema de pulo
+  private verticalVelocity = 0
+  private isGrounded = true
+  private jumpForce = 8
+  private gravity = 20
+  private groundLevel = 0
+
+  // Sistema de sprint
+  private sprintMultiplier = 1.8
+  private staminaDrain = 20 // por segundo
+  private staminaRegen = 15 // por segundo
+
   // Callbacks
   private onModelChangeCallbacks: Set<(modelId: string) => void> = new Set()
   private onHealthChangeCallbacks: Set<(health: number, maxHealth: number) => void> = new Set()
+  private onManaChangeCallbacks: Set<(mana: number, maxMana: number) => void> = new Set()
+  private onStaminaChangeCallbacks: Set<(stamina: number, maxStamina: number) => void> = new Set()
   private onDeathCallbacks: Set<() => void> = new Set()
 
   constructor() {
@@ -248,6 +267,53 @@ export class Player extends Entity {
   }
 
   /**
+   * Registra callback para mudanca de mana
+   */
+  public onManaChange(callback: (mana: number, maxMana: number) => void): () => void {
+    this.onManaChangeCallbacks.add(callback)
+    callback(this.mana, this.maxMana)
+    return () => this.onManaChangeCallbacks.delete(callback)
+  }
+
+  /**
+   * Registra callback para mudanca de stamina
+   */
+  public onStaminaChange(callback: (stamina: number, maxStamina: number) => void): () => void {
+    this.onStaminaChangeCallbacks.add(callback)
+    callback(this.stamina, this.maxStamina)
+    return () => this.onStaminaChangeCallbacks.delete(callback)
+  }
+
+  /**
+   * Pulo
+   */
+  public jump(): void {
+    if (this.isGrounded && !this.isDead) {
+      this.verticalVelocity = this.jumpForce
+      this.isGrounded = false
+      this.playAnimation('Jump')
+    }
+  }
+
+  /**
+   * Usa mana
+   */
+  public useMana(amount: number): boolean {
+    if (this.mana < amount) return false
+    this.mana -= amount
+    this.onManaChangeCallbacks.forEach(cb => cb(this.mana, this.maxMana))
+    return true
+  }
+
+  /**
+   * Recupera mana
+   */
+  public regenMana(amount: number): void {
+    this.mana = Math.min(this.maxMana, this.mana + amount)
+    this.onManaChangeCallbacks.forEach(cb => cb(this.mana, this.maxMana))
+  }
+
+  /**
    * Recebe dano
    */
   public takeDamage(amount: number): void {
@@ -350,7 +416,29 @@ export class Player extends Entity {
     // Não move se estiver morto
     if (this.isDead) return
 
-    // Calcula direção de movimento baseado no input
+    // ==================
+    // PULO E GRAVIDADE
+    // ==================
+    if (!this.isGrounded) {
+      this.verticalVelocity -= this.gravity * deltaTime
+      this.mesh.position.y += this.verticalVelocity * deltaTime
+
+      // Verifica se chegou ao chao
+      if (this.mesh.position.y <= this.groundLevel) {
+        this.mesh.position.y = this.groundLevel
+        this.verticalVelocity = 0
+        this.isGrounded = true
+      }
+    }
+
+    // Pulo (via input)
+    if (input.jump && this.isGrounded) {
+      this.jump()
+    }
+
+    // ==================
+    // MOVIMENTO HORIZONTAL
+    // ==================
     this.moveDirection.set(0, 0, 0)
 
     if (input.forward) this.moveDirection.z -= 1
@@ -361,6 +449,25 @@ export class Player extends Entity {
     // Verifica se está se movendo
     const isMoving = this.moveDirection.length() > 0
 
+    // ==================
+    // SPRINT
+    // ==================
+    let currentSpeed = this.moveSpeed
+    const isSprinting = input.sprint && isMoving && this.stamina > 0
+
+    if (isSprinting) {
+      currentSpeed *= this.sprintMultiplier
+      this.stamina = Math.max(0, this.stamina - this.staminaDrain * deltaTime)
+      this.onStaminaChangeCallbacks.forEach(cb => cb(this.stamina, this.maxStamina))
+    } else if (this.stamina < this.maxStamina) {
+      // Regenera stamina quando nao esta correndo
+      this.stamina = Math.min(this.maxStamina, this.stamina + this.staminaRegen * deltaTime)
+      this.onStaminaChangeCallbacks.forEach(cb => cb(this.stamina, this.maxStamina))
+    }
+
+    // ==================
+    // APLICA MOVIMENTO
+    // ==================
     if (isMoving) {
       this.moveDirection.normalize()
 
@@ -373,16 +480,26 @@ export class Player extends Entity {
       this.mesh.rotation.y += angleDiff * this.rotationSpeed * deltaTime * 5
 
       // Move o player
-      const velocity = this.moveDirection.multiplyScalar(this.moveSpeed * deltaTime)
+      const velocity = this.moveDirection.multiplyScalar(currentSpeed * deltaTime)
       this.mesh.position.add(velocity)
 
       // Tocar animação de andar/correr
-      this.playAnimation('Walking')
+      if (this.isGrounded) {
+        this.playAnimation(isSprinting ? 'Run' : 'Walking')
+      }
     } else {
-      // Tocar animação idle (apenas se não estiver atacando)
-      if (this.currentAnimationName !== 'Attack') {
+      // Tocar animação idle (apenas se não estiver atacando ou pulando)
+      if (this.currentAnimationName !== 'Attack' && this.isGrounded) {
         this.playAnimation('Idle')
       }
+    }
+
+    // ==================
+    // REGENERACAO DE MANA
+    // ==================
+    if (this.mana < this.maxMana) {
+      this.mana = Math.min(this.maxMana, this.mana + 2 * deltaTime) // 2 mana por segundo
+      this.onManaChangeCallbacks.forEach(cb => cb(this.mana, this.maxMana))
     }
   }
 
