@@ -470,6 +470,14 @@ Cada item precisa ser validado manualmente.
 - [ ] Sons de ambiente (loop)
 - [ ] Musica de fundo
 
+### 15.3 Pagina de Assets - Sons (`/assets`)
+- [x] Aba de Sons na pagina de assets
+- [x] Listagem de todos os sons por categoria
+- [x] Player de audio (play/pause) em cada card
+- [x] Preview de audio no painel de detalhes
+- [x] Filtro por categoria de sons
+- [x] Busca por nome/ID
+
 ---
 
 ## 16. Persistencia de Dados (NOVO)
@@ -509,6 +517,38 @@ Cada item precisa ser validado manualmente.
 
 ---
 
+## 17. Sistema de Publicacao de Jogos (NOVO)
+
+> **Nota:** Campo `is_public` ja existe no banco de dados, so precisa implementar a UI
+
+### 17.1 Configuracao do Projeto
+- [ ] Toggle "Publico/Privado" nas configuracoes do projeto
+- [ ] Descricao publica do jogo
+- [ ] Thumbnail/screenshot do jogo
+- [ ] Tags do jogo (RPG, Aventura, PvP, etc.)
+- [ ] Versao do jogo
+
+### 17.2 Pagina Showcase (`/showcase`)
+- [ ] Buscar jogos publicos do banco de dados (nao do JSON estatico)
+- [ ] Grid de jogos publicados
+- [ ] Filtro por tags
+- [ ] Busca por nome
+- [ ] Ordenar por data/popularidade
+
+### 17.3 Rota de Jogo Publico (`/play/:projectId`)
+- [ ] Carregar jogo publico pelo ID
+- [ ] Mostrar HUD do jogo
+- [ ] Botao "Voltar ao Showcase"
+- [ ] Info do autor e descricao
+- [ ] Contador de visualizacoes (opcional)
+
+### 17.4 API Endpoints
+- [ ] `GET /api/projects/public` - Lista jogos publicos
+- [ ] `PUT /api/projects/:id` - Atualizar is_public
+- [ ] `GET /api/projects/:id/public` - Dados publicos de um projeto
+
+---
+
 ## Proximos Passos
 
 1. Testar cada item acima
@@ -516,10 +556,11 @@ Cada item precisa ser validado manualmente.
 3. Corrigir bugs encontrados
 4. Atualizar roadmap na landing page conforme realidade
 5. Remover features nao implementadas da landing page
-6. **Extrair rpg_sound_pack.zip para /public/assets/sounds/**
-7. **Implementar HUD estilo MMORPG**
+6. ~~Extrair rpg_sound_pack.zip para /public/assets/sounds/~~ FEITO
+7. ~~Implementar HUD estilo MMORPG~~ FEITO (basico)
 8. **Implementar sistema de inventario robusto**
 9. **Implementar sistema de persistencia no banco**
+10. **Implementar sistema de publicacao de jogos**
 
 ---
 
