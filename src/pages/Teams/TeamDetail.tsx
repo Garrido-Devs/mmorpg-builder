@@ -5,7 +5,7 @@ import { useTeam } from '../../hooks/useTeam'
 import { TeamMembers } from '../../components/teams/TeamMembers'
 import { InviteLink } from '../../components/teams/InviteLink'
 import { Navbar } from '@/components/shared'
-import type { InviteInfo, TeamMember, TeamProject, Team } from '../../types/team'
+import type { InviteInfo } from '../../types/team'
 import '../../styles/teams.css'
 
 /**
@@ -15,10 +15,7 @@ export function TeamDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user } = useAuthContext()
-  const { fetchTeam, getInviteLink, regenerateInvite, isLoading, error } = useTeam()
-  const [team, setTeam] = useState<Team | null>(null)
-  const [members, setMembers] = useState<TeamMember[]>([])
-  const [projects, setProjects] = useState<TeamProject[]>([])
+  const { currentTeam, fetchTeam, getInviteLink, regenerateInvite, isLoading, error } = useTeam()
   const [invite, setInvite] = useState<InviteInfo | null>(null)
   const [inviteLoading, setInviteLoading] = useState(false)
 
@@ -30,16 +27,11 @@ export function TeamDetail() {
 
   const loadTeam = async () => {
     if (!id) return
-    const data = await fetchTeam(id)
-    if (data) {
-      setTeam(data)
-      setMembers(data.members || [])
-      setProjects(data.projects || [])
-      // Load invite link
-      const inviteData = await getInviteLink(id)
-      if (inviteData) {
-        setInvite(inviteData)
-      }
+    await fetchTeam(id)
+    // Load invite link after team is loaded
+    const inviteData = await getInviteLink(id)
+    if (inviteData) {
+      setInvite(inviteData)
     }
   }
 
@@ -57,10 +49,14 @@ export function TeamDetail() {
     return null
   }
 
+  // Use currentTeam from hook
+  const team = currentTeam
+  const members = currentTeam?.members || []
+  const projects = currentTeam?.projects || []
+
   const isOwner = team?.ownerId === user?.id
-  // Note: member.id is the member's user ID in this context
   const currentMember = members.find(m => m.id === user?.id)
-  const currentUserRole = isOwner ? 'owner' : currentMember?.role || 'member'
+  const currentUserRole = team?.currentUserRole || (isOwner ? 'owner' : currentMember?.role || 'member')
   const isAdmin = currentUserRole === 'owner' || currentUserRole === 'admin'
 
   return (
