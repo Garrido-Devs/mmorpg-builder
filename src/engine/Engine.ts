@@ -48,6 +48,9 @@ export class Engine {
   private onModeChangeCallbacks: Set<(mode: GameMode) => void> = new Set()
   private onObjectSelectedCallbacks: Set<(obj: THREE.Object3D | null) => void> = new Set()
   private onMapUpdateCallbacks: Set<(data: MapData) => void> = new Set()
+  private onPlayerMoveCallbacks: Set<(pos: { x: number; y: number; z: number }) => void> = new Set()
+  private lastPlayerPos = { x: 0, y: 0, z: 0 }
+  private playerMoveThrottle = 0
 
   constructor() {
     // Inicializa cena e câmera
@@ -167,6 +170,19 @@ export class Engine {
 
       // Atualiza sistema de IA
       this.aiSystem.update(deltaTime, this.player.mesh.position)
+
+      // Notifica mudança de posição do player (throttled)
+      this.playerMoveThrottle += deltaTime
+      if (this.playerMoveThrottle >= 0.1) { // 10 vezes por segundo max
+        this.playerMoveThrottle = 0
+        const pos = this.player.mesh.position
+        const dx = Math.abs(pos.x - this.lastPlayerPos.x)
+        const dz = Math.abs(pos.z - this.lastPlayerPos.z)
+        if (dx > 0.01 || dz > 0.01) {
+          this.lastPlayerPos = { x: pos.x, y: pos.y, z: pos.z }
+          this.onPlayerMoveCallbacks.forEach(cb => cb(this.lastPlayerPos))
+        }
+      }
     }
 
     // Atualiza animações de todos os objetos do mapa
@@ -378,6 +394,11 @@ export class Engine {
   public onMapUpdate(callback: (data: MapData) => void): () => void {
     this.onMapUpdateCallbacks.add(callback)
     return () => this.onMapUpdateCallbacks.delete(callback)
+  }
+
+  public onPlayerMove(callback: (pos: { x: number; y: number; z: number }) => void): () => void {
+    this.onPlayerMoveCallbacks.add(callback)
+    return () => this.onPlayerMoveCallbacks.delete(callback)
   }
 
   private notifyObjectSelected(obj: THREE.Object3D | null): void {

@@ -58,6 +58,15 @@ export function Editor() {
     }
   }, [collaboration.activeUsers])
 
+  // Envia posição do player para colaboração
+  useEffect(() => {
+    const engine = getEngine()
+    const unsubscribe = engine.onPlayerMove((pos) => {
+      collaboration.updateCursor(pos)
+    })
+    return unsubscribe
+  }, [collaboration.updateCursor])
+
   // Load project and connect collaboration
   const disconnectRef = useRef(collaboration.disconnect)
   disconnectRef.current = collaboration.disconnect

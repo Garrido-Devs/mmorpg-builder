@@ -99,13 +99,14 @@ export class CollaboratorSystem {
     const pos = user.cursorPosition || { x: 0, y: 0, z: 0 }
     group.position.set(pos.x, pos.y, pos.z)
 
-    // Configura animacoes
+    // Configura animacoes - mixer no model, nao no group
     let mixer: THREE.AnimationMixer | null = null
     const animations = new Map<string, THREE.AnimationClip>()
     let currentAction: THREE.AnimationAction | null = null
 
     if (this.modelAnimations.length > 0) {
-      mixer = new THREE.AnimationMixer(group)
+      // Mixer deve ser no model que contem os bones
+      mixer = new THREE.AnimationMixer(model)
 
       this.modelAnimations.forEach((clip) => {
         let name = clip.name
@@ -253,7 +254,8 @@ export class CollaboratorSystem {
       // Verifica se esta se movendo para trocar animacao
       const distance = collab.group.position.distanceTo(collab.targetPosition)
       if (distance > 0.1) {
-        this.playAnimation(collab, 'Walking')
+        // Usa Walking_A que e o nome correto no modelo KayKit
+        this.playAnimation(collab, 'Walking_A')
 
         // Rotaciona para direcao do movimento
         const direction = new THREE.Vector3()
