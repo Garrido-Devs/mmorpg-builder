@@ -82,8 +82,13 @@ export class CollaboratorSystem {
         // Clona material e adiciona cor do usuario
         if (child.material) {
           const mat = (child.material as THREE.MeshStandardMaterial).clone()
+          // Garante que o material seja opaco (nao transparente)
+          mat.transparent = false
+          mat.opacity = 1
+          mat.depthWrite = true
+          // Adiciona brilho sutil com a cor do usuario
           mat.emissive = new THREE.Color(user.color)
-          mat.emissiveIntensity = 0.2
+          mat.emissiveIntensity = 0.15
           child.material = mat
         }
       }
