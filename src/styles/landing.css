@@ -658,6 +658,18 @@
   border: 2px solid var(--landing-border);
 }
 
+.roadmap-dot.current {
+  background: var(--landing-accent);
+  border: 2px solid var(--landing-accent);
+  box-shadow: 0 0 20px var(--landing-accent-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 10px var(--landing-accent-glow); }
+  50% { box-shadow: 0 0 25px var(--landing-accent-glow); }
+}
+
 .roadmap-content {
   flex: 1;
   padding-bottom: 1rem;
@@ -839,6 +851,130 @@
 .footer-copyright a:hover {
   color: var(--landing-accent-glow);
   text-decoration: underline;
+}
+
+/* ============================================
+   Hero Note
+   ============================================ */
+
+.hero-note {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--landing-text-secondary);
+}
+
+.hero-note a {
+  color: var(--landing-accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.hero-note a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   Feature Highlight
+   ============================================ */
+
+.feature-highlight {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-color: var(--landing-accent);
+}
+
+.feature-highlight:hover {
+  border-color: var(--landing-accent-glow);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2);
+}
+
+/* ============================================
+   CTA Section
+   ============================================ */
+
+.cta-section {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+  border-top: 1px solid var(--landing-accent);
+  border-bottom: 1px solid var(--landing-accent);
+}
+
+.cta-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cta-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--landing-text);
+  margin-bottom: 1rem;
+}
+
+.cta-description {
+  font-size: 1.25rem;
+  color: var(--landing-text-secondary);
+  margin-bottom: 2rem;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-large {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+}
+
+/* ============================================
+   Navbar User Elements
+   ============================================ */
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar-user-name {
+  color: var(--landing-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.navbar-logout {
+  background: transparent;
+  border: 1px solid var(--landing-border);
+  color: var(--landing-text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navbar-logout:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.navbar-login {
+  color: var(--landing-text-secondary);
+}
+
+.navbar-login:hover {
+  color: var(--landing-text);
+}
+
+.navbar-mobile-logout {
+  color: #ef4444 !important;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
 }
 
 /* ============================================

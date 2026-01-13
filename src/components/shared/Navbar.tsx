@@ -1,9 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 export function Navbar() {
   const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userName, setUserName] = useState('')
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem('auth_token')
+    const userStr = localStorage.getItem('auth_user')
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr)
+        setIsLoggedIn(true)
+        setUserName(user.name || 'Usuario')
+      } catch {
+        setIsLoggedIn(false)
+      }
+    } else {
+      setIsLoggedIn(false)
+    }
+  }, [location])
 
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === '/'
@@ -11,6 +30,14 @@ export function Navbar() {
   }
 
   const closeMenu = () => setIsMenuOpen(false)
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('auth_user')
+    setIsLoggedIn(false)
+    setUserName('')
+    window.location.href = '/'
+  }
 
   return (
     <nav className="navbar">
@@ -35,14 +62,14 @@ export function Navbar() {
         <Link to="/" className={`navbar-link ${isActive('/') ? 'active' : ''}`}>
           Home
         </Link>
+        <Link to="/blog" className={`navbar-link ${isActive('/blog') ? 'active' : ''}`}>
+          Features
+        </Link>
         <Link to="/docs" className={`navbar-link ${isActive('/docs') ? 'active' : ''}`}>
-          Documentacao
+          Docs
         </Link>
         <Link to="/assets" className={`navbar-link ${isActive('/assets') ? 'active' : ''}`}>
           Assets
-        </Link>
-        <Link to="/showcase" className={`navbar-link ${isActive('/showcase') ? 'active' : ''}`}>
-          Showcase
         </Link>
         <a
           href="https://github.com/Garrido-Devs/mmorpg-builder"
@@ -52,9 +79,29 @@ export function Navbar() {
         >
           GitHub
         </a>
-        <Link to="/editor" className="navbar-cta">
-          Abrir Editor
-        </Link>
+
+        {isLoggedIn ? (
+          <>
+            <Link to="/dashboard" className={`navbar-link ${isActive('/dashboard') ? 'active' : ''}`}>
+              Dashboard
+            </Link>
+            <div className="navbar-user">
+              <span className="navbar-user-name">{userName}</span>
+              <button onClick={handleLogout} className="navbar-logout">
+                Sair
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <Link to="/auth/login" className="navbar-link navbar-login">
+              Entrar
+            </Link>
+            <Link to="/auth/register" className="navbar-cta">
+              Criar Conta
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Mobile Menu Overlay */}
@@ -72,11 +119,18 @@ export function Navbar() {
           Home
         </Link>
         <Link
+          to="/blog"
+          className={`navbar-mobile-link ${isActive('/blog') ? 'active' : ''}`}
+          onClick={closeMenu}
+        >
+          Features
+        </Link>
+        <Link
           to="/docs"
           className={`navbar-mobile-link ${isActive('/docs') ? 'active' : ''}`}
           onClick={closeMenu}
         >
-          Documentacao
+          Docs
         </Link>
         <Link
           to="/assets"
@@ -84,13 +138,6 @@ export function Navbar() {
           onClick={closeMenu}
         >
           Assets
-        </Link>
-        <Link
-          to="/showcase"
-          className={`navbar-mobile-link ${isActive('/showcase') ? 'active' : ''}`}
-          onClick={closeMenu}
-        >
-          Showcase
         </Link>
         <a
           href="https://github.com/Garrido-Devs/mmorpg-builder"
@@ -101,9 +148,55 @@ export function Navbar() {
         >
           GitHub
         </a>
-        <Link to="/editor" className="navbar-cta navbar-mobile-cta" onClick={closeMenu}>
-          Abrir Editor
-        </Link>
+
+        {isLoggedIn ? (
+          <>
+            <Link
+              to="/dashboard"
+              className={`navbar-mobile-link ${isActive('/dashboard') ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/teams"
+              className={`navbar-mobile-link ${isActive('/teams') ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              Meus Times
+            </Link>
+            <Link
+              to="/projects"
+              className={`navbar-mobile-link ${isActive('/projects') ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              Meus Projetos
+            </Link>
+            <button
+              className="navbar-mobile-link navbar-mobile-logout"
+              onClick={() => { handleLogout(); closeMenu(); }}
+            >
+              Sair ({userName})
+            </button>
+          </>
+        ) : (
+          <>
+            <Link
+              to="/auth/login"
+              className="navbar-mobile-link"
+              onClick={closeMenu}
+            >
+              Entrar
+            </Link>
+            <Link
+              to="/auth/register"
+              className="navbar-cta navbar-mobile-cta"
+              onClick={closeMenu}
+            >
+              Criar Conta Gratis
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   )

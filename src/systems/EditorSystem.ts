@@ -120,6 +120,13 @@ export class EditorSystem implements GameSystem {
   }
 
   /**
+   * Retorna o TransformControls para permitir eventos externos
+   */
+  public getTransformControls(): TransformControls | null {
+    return this.transformControls
+  }
+
+  /**
    * Ativa/desativa o editor
    */
   public setEnabled(enabled: boolean): void {

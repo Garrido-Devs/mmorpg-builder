@@ -4,6 +4,7 @@ import { EditorTopBar } from './EditorTopBar'
 import { EditorSidebar } from './EditorSidebar'
 import { EditorStatusBar } from './EditorStatusBar'
 import '../../styles/editor.css'
+import '../../styles/game-editor.css'
 
 interface EditorLayoutProps {
   mode: GameMode

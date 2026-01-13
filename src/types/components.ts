@@ -27,6 +27,15 @@ export type ComponentType =
   | 'collider'
   | 'animator'
   | 'custom_script'
+  // Novos componentes MMORPG
+  | 'resource_node'
+  | 'crafting_station'
+  | 'bank'
+  | 'skill'
+  | 'equipment'
+  | 'prayer_altar'
+  | 'agility_obstacle'
+  | 'farming_patch'
 
 // ============================================
 // Interface base para todos os componentes
@@ -380,6 +389,256 @@ export interface CustomScriptComponent extends BaseComponent {
 }
 
 // ============================================
+// Componente: Resource Node (Mineração, Lenhador, Pesca)
+// ============================================
+
+export type ResourceType = 'ore' | 'tree' | 'fishing' | 'herb' | 'custom'
+
+export interface ResourceNodeComponent extends BaseComponent {
+  type: 'resource_node'
+  resourceId: string
+  resourceName: string
+  resourceType: ResourceType
+  requiredSkill: string
+  requiredLevel: number
+  requiredTool: string
+  xpReward: number
+  harvestItem: string
+  minQuantity: number
+  maxQuantity: number
+  harvestTime: number
+  maxUses: number
+  respawnTime: number
+  depletedModel: string
+  harvestAnimation: string
+  harvestSound: string
+  // Eventos
+  onHarvestStart: string
+  onHarvest: string
+  onDeplete: string
+  onRespawn: string
+}
+
+// ============================================
+// Componente: Crafting Station (Forja, Fogão, Bancada)
+// ============================================
+
+export type CraftingStationType = 'anvil' | 'range' | 'fire' | 'workbench' | 'loom' | 'pottery' | 'altar' | 'custom'
+
+export interface CraftingStationComponent extends BaseComponent {
+  type: 'crafting_station'
+  stationId: string
+  stationName: string
+  stationType: CraftingStationType
+  associatedSkill: string
+  requiredLevel: number
+  recipes: string[]
+  xpBonus: number
+  successBonus: number
+  requiresFuel: boolean
+  fuelType: string
+  useAnimation: string
+  useSound: string
+  particles: string
+  // Eventos
+  onCraftStart: string
+  onCraftComplete: string
+  onCraftFail: string
+}
+
+// ============================================
+// Componente: Bank (Sistema de Armazenamento)
+// ============================================
+
+export interface BankComponent extends BaseComponent {
+  type: 'bank'
+  bankId: string
+  bankName: string
+  baseSlots: number
+  slotsPerUpgrade: number
+  maxUpgrades: number
+  upgradeCost: number
+  depositFee: number
+  withdrawFee: number
+  allowNotes: boolean
+  allowPlaceholders: boolean
+  tabCount: number
+  requiredQuest: string
+  requiredLevel: number
+  welcomeMessage: string
+  // Eventos
+  onOpen: string
+  onDeposit: string
+  onWithdraw: string
+}
+
+// ============================================
+// Componente: Skill (Sistema de Habilidades)
+// ============================================
+
+export type SkillCategory = 'gathering' | 'combat' | 'artisan' | 'support'
+
+export interface SkillComponent extends BaseComponent {
+  type: 'skill'
+  skillId: string
+  skillName: string
+  skillIcon: string
+  skillColor: string
+  skillCategory: SkillCategory
+  maxLevel: number
+  baseXp: number
+  xpMultiplier: number
+  isElite: boolean
+  parentSkill: string
+  parentLevelRequired: number
+  levelUnlocks: string[]
+  skillCape: string
+  // Eventos
+  onXpGain: string
+  onLevelUp: string
+  onMaxLevel: string
+}
+
+// ============================================
+// Componente: Equipment (Slots de Equipamento)
+// ============================================
+
+export type EquipmentSlot = 'head' | 'cape' | 'amulet' | 'weapon' | 'body' | 'shield' | 'legs' | 'gloves' | 'boots' | 'ring' | 'ammo' | 'two_handed'
+export type CombatStyle = 'melee' | 'ranged' | 'magic' | 'hybrid' | 'none'
+
+export interface EquipmentComponent extends BaseComponent {
+  type: 'equipment'
+  equipmentId: string
+  equipmentName: string
+  slot: EquipmentSlot
+  combatStyle: CombatStyle
+  // Bônus de ataque
+  attackStab: number
+  attackSlash: number
+  attackCrush: number
+  attackMagic: number
+  attackRanged: number
+  // Bônus de defesa
+  defenseStab: number
+  defenseSlash: number
+  defenseCrush: number
+  defenseMagic: number
+  defenseRanged: number
+  // Outros bônus
+  strengthBonus: number
+  rangedStrength: number
+  magicDamage: number
+  prayerBonus: number
+  attackSpeed: number
+  // Requisitos
+  requiredAttack: number
+  requiredStrength: number
+  requiredDefence: number
+  requiredRanged: number
+  requiredMagic: number
+  requiredQuest: string
+  // Degradação
+  degradable: boolean
+  maxCharges: number
+  repairCost: number
+  specialEffects: string[]
+  // Eventos
+  onEquip: string
+  onUnequip: string
+  onAttack: string
+}
+
+// ============================================
+// Componente: Prayer Altar
+// ============================================
+
+export type AltarType = 'normal' | 'gilded' | 'chaos' | 'nature'
+
+export interface PrayerAltarComponent extends BaseComponent {
+  type: 'prayer_altar'
+  altarId: string
+  altarName: string
+  altarType: AltarType
+  restoresPrayer: boolean
+  acceptsBones: boolean
+  xpBonus: number
+  burnersLit: number
+  burnerBonus: number
+  restoreCooldown: number
+  prayAnimation: string
+  praySound: string
+  // Eventos
+  onRestore: string
+  onOffer: string
+}
+
+// ============================================
+// Componente: Agility Obstacle
+// ============================================
+
+export type ObstacleType = 'jump' | 'climb' | 'swing' | 'cross' | 'slide' | 'balance' | 'custom'
+
+export interface AgilityObstacleComponent extends BaseComponent {
+  type: 'agility_obstacle'
+  obstacleId: string
+  obstacleName: string
+  obstacleType: ObstacleType
+  requiredLevel: number
+  baseXp: number
+  isPartOfCourse: boolean
+  courseId: string
+  courseOrder: number
+  canFail: boolean
+  failChance: number
+  failDamage: number
+  failPosition: { x: number; y: number; z: number }
+  destinationPosition: { x: number; y: number; z: number }
+  crossTime: number
+  animation: string
+  sound: string
+  // Eventos
+  onStart: string
+  onComplete: string
+  onFail: string
+}
+
+// ============================================
+// Componente: Farming Patch
+// ============================================
+
+export type FarmingPatchType = 'allotment' | 'herb' | 'tree' | 'fruit_tree' | 'flower' | 'bush' | 'hops' | 'special'
+
+export interface FarmingPatchComponent extends BaseComponent {
+  type: 'farming_patch'
+  patchId: string
+  patchName: string
+  patchType: FarmingPatchType
+  requiredLevel: number
+  acceptedSeeds: string[]
+  acceptsCompost: boolean
+  baseGrowTime: number
+  growthStages: number
+  canGetDiseased: boolean
+  diseaseChance: number
+  cureItem: string
+  protectionNpc: string
+  protectionPayment: string[]
+  plantXp: number
+  harvestXp: number
+  healthCheckXp: number
+  emptyModel: string
+  stageModels: string[]
+  diseasedModel: string
+  deadModel: string
+  // Eventos
+  onPlant: string
+  onGrow: string
+  onHarvest: string
+  onDisease: string
+  onDie: string
+}
+
+// ============================================
 // Union type de todos os componentes
 // ============================================
 
@@ -400,6 +659,15 @@ export type Component =
   | ColliderComponent
   | AnimatorComponent
   | CustomScriptComponent
+  // Novos componentes MMORPG
+  | ResourceNodeComponent
+  | CraftingStationComponent
+  | BankComponent
+  | SkillComponent
+  | EquipmentComponent
+  | PrayerAltarComponent
+  | AgilityObstacleComponent
+  | FarmingPatchComponent
 
 // ============================================
 // Definições de componentes (metadados para o editor)

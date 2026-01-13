@@ -1,8 +1,10 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo, memo } from 'react'
 import type { Component, ComponentPropertyDefinition } from '../../types'
 import { COMPONENT_DEFINITIONS } from '../../data/ComponentDefinitions'
 import { AssetSelectorModal } from './modals/AssetSelectorModal'
 import { ScriptSelectorModal } from './modals/ScriptSelectorModal'
+import { ArrayEditorModal } from './modals/ArrayEditorModal'
+import { ObjectEditorModal } from './modals/ObjectEditorModal'
 
 interface ComponentEditorProps {
   component: Component
@@ -15,10 +17,12 @@ interface ComponentEditorProps {
  *
  * Renderiza campos de edição baseado na definição do componente
  */
-export function ComponentEditor({ component, onUpdate, onRemove }: ComponentEditorProps) {
+export const ComponentEditor = memo(function ComponentEditor({ component, onUpdate, onRemove }: ComponentEditorProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [assetModal, setAssetModal] = useState<{ open: boolean; key: string; filterType?: string }>({ open: false, key: '' })
   const [scriptModal, setScriptModal] = useState<{ open: boolean; key: string }>({ open: false, key: '' })
+  const [arrayModal, setArrayModal] = useState<{ open: boolean; key: string; items: unknown[] }>({ open: false, key: '', items: [] })
+  const [objectModal, setObjectModal] = useState<{ open: boolean; key: string; data: Record<string, unknown> }>({ open: false, key: '', data: {} })
   const definition = COMPONENT_DEFINITIONS[component.type]
 
   if (!definition) {
@@ -32,13 +36,15 @@ export function ComponentEditor({ component, onUpdate, onRemove }: ComponentEdit
     )
   }
 
-  // Agrupa propriedades por grupo
-  const groupedProperties = definition.properties.reduce((acc, prop) => {
-    const group = prop.group || 'Geral'
-    if (!acc[group]) acc[group] = []
-    acc[group].push(prop)
-    return acc
-  }, {} as Record<string, ComponentPropertyDefinition[]>)
+  // Agrupa propriedades por grupo (memoizado)
+  const groupedProperties = useMemo(() => {
+    return definition.properties.reduce((acc, prop) => {
+      const group = prop.group || 'Geral'
+      if (!acc[group]) acc[group] = []
+      acc[group].push(prop)
+      return acc
+    }, {} as Record<string, ComponentPropertyDefinition[]>)
+  }, [definition.properties])
 
   const handlePropertyChange = useCallback((key: string, value: unknown) => {
     onUpdate({ [key]: value } as Partial<Component>)
@@ -204,13 +210,30 @@ export function ComponentEditor({ component, onUpdate, onRemove }: ComponentEdit
             <span style={{ fontSize: '11px', color: 'var(--editor-text-muted)' }}>
               {Array.isArray(value) ? `${(value as unknown[]).length} itens` : '0 itens'}
             </span>
-            <button className="editor-btn editor-btn-sm">Editar Lista</button>
+            <button
+              className="editor-btn editor-btn-sm"
+              onClick={() => setArrayModal({
+                open: true,
+                key: prop.key,
+                items: Array.isArray(value) ? value as unknown[] : []
+              })}
+            >
+              Editar Lista
+            </button>
           </div>
         )
 
       case 'object':
         return (
-          <button className="editor-btn editor-btn-sm" style={{ width: '100%' }}>
+          <button
+            className="editor-btn editor-btn-sm"
+            style={{ width: '100%' }}
+            onClick={() => setObjectModal({
+              open: true,
+              key: prop.key,
+              data: typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+            })}
+          >
             Editar Objeto
           </button>
         )
@@ -318,6 +341,22 @@ export function ComponentEditor({ component, onUpdate, onRemove }: ComponentEdit
       onSelect={(scriptId) => handlePropertyChange(scriptModal.key, scriptId)}
       title="Selecionar Script"
     />
+
+    <ArrayEditorModal
+      isOpen={arrayModal.open}
+      onClose={() => setArrayModal({ open: false, key: '', items: [] })}
+      onSave={(items) => handlePropertyChange(arrayModal.key, items)}
+      items={arrayModal.items}
+      title="Editar Lista"
+    />
+
+    <ObjectEditorModal
+      isOpen={objectModal.open}
+      onClose={() => setObjectModal({ open: false, key: '', data: {} })}
+      onSave={(data) => handlePropertyChange(objectModal.key, data)}
+      data={objectModal.data}
+      title="Editar Objeto"
+    />
     </>
   )
-}
+})

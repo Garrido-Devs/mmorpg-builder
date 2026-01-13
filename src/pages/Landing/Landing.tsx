@@ -17,29 +17,99 @@ export function Landing() {
       <section className="hero landing-section">
         <div className="hero-content">
           <div className="hero-badge">
-            <span>100% Open Source</span>
+            <span>Colaboracao em Tempo Real</span>
           </div>
           <h1 className="hero-title">
-            Crie seu <span>MMORPG 3D</span> no navegador
+            Crie seu <span>MMORPG 3D</span> com sua equipe
           </h1>
           <p className="hero-description">
-            Editor visual completo para criar jogos MMORPG. Posicione NPCs, configure comportamentos de IA,
-            adicione colisoes e interacoes - tudo sem precisar escrever codigo.
+            Editor visual colaborativo para criar jogos MMORPG. Trabalhe em equipe em tempo real,
+            gerencie projetos, convide membros - tudo no navegador.
           </p>
           <div className="hero-buttons">
-            <Link to="/editor" className="btn-primary">
-              Comecar Agora
+            <Link to="/auth/register" className="btn-primary">
+              Criar Conta Gratis
             </Link>
-            <Link to="/docs" className="btn-secondary">
-              Ver Documentacao
+            <Link to="/blog" className="btn-secondary">
+              Ver Features
             </Link>
           </div>
+          <p className="hero-note">
+            Ja tem uma conta? <Link to="/auth/login">Entrar</Link>
+          </p>
         </div>
 
         <div className="hero-preview">
           <div className="hero-preview-placeholder">
-            <div className="hero-preview-placeholder-icon">🎮</div>
-            <p>Editor 3D Interativo</p>
+            <div className="hero-preview-placeholder-icon">👥</div>
+            <p>Colaboracao em Tempo Real</p>
+          </div>
+        </div>
+      </section>
+
+      {/* New: Collaboration Features */}
+      <section className="collab-features landing-section">
+        <div className="section-header">
+          <span className="section-tag">Novo</span>
+          <h2 className="section-title">Trabalhe em Equipe</h2>
+          <p className="section-description">
+            Sistema completo de colaboracao para criar jogos em equipe.
+          </p>
+        </div>
+
+        <div className="features-grid">
+          <div className="feature-card feature-highlight">
+            <div className="feature-icon">👥</div>
+            <h3 className="feature-title">Times e Projetos</h3>
+            <p className="feature-description">
+              Crie times, convide membros por link, gerencie permissoes.
+              Cada time pode ter multiplos projetos.
+            </p>
+          </div>
+
+          <div className="feature-card feature-highlight">
+            <div className="feature-icon">⚡</div>
+            <h3 className="feature-title">Edicao em Tempo Real</h3>
+            <p className="feature-description">
+              Veja outros membros editando ao vivo. Cursores coloridos,
+              sincronizacao automatica, sem conflitos.
+            </p>
+          </div>
+
+          <div className="feature-card feature-highlight">
+            <div className="feature-icon">☁️</div>
+            <h3 className="feature-title">Salvamento na Nuvem</h3>
+            <p className="feature-description">
+              Projetos salvos automaticamente no Vercel. Acesse de qualquer
+              lugar, qualquer dispositivo.
+            </p>
+          </div>
+
+          <div className="feature-card feature-highlight">
+            <div className="feature-icon">🔐</div>
+            <h3 className="feature-title">Autenticacao Segura</h3>
+            <p className="feature-description">
+              Sistema de contas com JWT. Seus projetos protegidos,
+              apenas membros do time podem acessar.
+            </p>
+          </div>
+
+          <div className="feature-card feature-highlight">
+            <div className="feature-icon">🔗</div>
+            <h3 className="feature-title">Convites por Link</h3>
+            <p className="feature-description">
+              Convide membros para seu time com um link unico.
+              Controle quem pode entrar, regenere links quando quiser.
+            </p>
+          </div>
+
+          <div className="feature-card feature-highlight">
+            <div className="feature-icon">👁️</div>
+            <h3 className="feature-title">Presenca em Tempo Real</h3>
+            <p className="feature-description">
+              Veja quem esta online no projeto. Avatares e indicadores
+              mostram onde cada membro esta trabalhando.
+            </p>
           </div>
         </div>
       </section>
@@ -47,10 +117,10 @@ export function Landing() {
       {/* Features Section */}
       <section className="features landing-section">
         <div className="section-header">
-          <span className="section-tag">Recursos</span>
-          <h2 className="section-title">Tudo que voce precisa para criar seu jogo</h2>
+          <span className="section-tag">Editor</span>
+          <h2 className="section-title">Ferramentas Profissionais</h2>
           <p className="section-description">
-            Ferramentas profissionais de desenvolvimento de jogos, acessiveis para todos.
+            Tudo que voce precisa para criar seu jogo MMORPG.
           </p>
         </div>
 
@@ -83,20 +153,20 @@ export function Landing() {
           </div>
 
           <div className="feature-card">
-            <div className="feature-icon">🧩</div>
-            <h3 className="feature-title">Sistema de Componentes</h3>
+            <div className="feature-icon">⛏️</div>
+            <h3 className="feature-title">Componentes MMORPG</h3>
             <p className="feature-description">
-              16 tipos de componentes: colisores, triggers, spawners, portais,
-              lojas, quest givers e muito mais.
+              Resource Nodes, Crafting Stations, Banks, Skills, Equipment,
+              Prayer Altars, Agility e Farming - estilo RuneScape.
             </p>
           </div>
 
           <div className="feature-card">
-            <div className="feature-icon">💾</div>
-            <h3 className="feature-title">Salvar e Carregar Mapas</h3>
+            <div className="feature-icon">🧩</div>
+            <h3 className="feature-title">+20 Tipos de Componentes</h3>
             <p className="feature-description">
-              Exporte seus mapas como JSON, salve no navegador ou baixe para compartilhar
-              com outros desenvolvedores.
+              Colisores, triggers, spawners, portais, lojas, quest givers,
+              dialogos e muito mais.
             </p>
           </div>
 
@@ -150,28 +220,28 @@ export function Landing() {
         <div className="steps-container">
           <div className="step-card">
             <div className="step-number">1</div>
-            <h3 className="step-title">Clone o Projeto</h3>
+            <h3 className="step-title">Crie sua Conta</h3>
             <p className="step-description">
-              Clone o repositorio do GitHub, instale as dependencias
-              com npm install e inicie o servidor de desenvolvimento.
+              Registre-se gratuitamente. Crie um time e convide
+              seus colegas pelo link de convite.
             </p>
           </div>
 
           <div className="step-card">
             <div className="step-number">2</div>
-            <h3 className="step-title">Customize seu Mundo</h3>
+            <h3 className="step-title">Crie um Projeto</h3>
             <p className="step-description">
-              Use o editor visual para posicionar assets, configurar
-              NPCs, criar triggers e definir a logica do seu jogo.
+              Inicie um novo projeto de jogo. Configure titulo, descricao,
+              tela de intro, loading e menu principal.
             </p>
           </div>
 
           <div className="step-card">
             <div className="step-number">3</div>
-            <h3 className="step-title">Publique seu Jogo</h3>
+            <h3 className="step-title">Edite em Equipe</h3>
             <p className="step-description">
-              Faca o build de producao e hospede em qualquer servico
-              de hospedagem estatica. Seu jogo estara online!
+              Use o editor visual para criar seu mundo. Trabalhe junto
+              com sua equipe em tempo real!
             </p>
           </div>
         </div>
@@ -191,7 +261,7 @@ export function Landing() {
           <div className="roadmap-item">
             <div className="roadmap-dot completed"></div>
             <div className="roadmap-content">
-              <div className="roadmap-phase">Fase 1 - Atual</div>
+              <div className="roadmap-phase">Fase 1 - Concluida</div>
               <h3 className="roadmap-title">MVP - Editor Base</h3>
               <div className="roadmap-features">
                 <span className="roadmap-tag">Editor Visual</span>
@@ -203,10 +273,38 @@ export function Landing() {
           </div>
 
           <div className="roadmap-item">
+            <div className="roadmap-dot completed"></div>
+            <div className="roadmap-content">
+              <div className="roadmap-phase">Fase 2 - Concluida</div>
+              <h3 className="roadmap-title">Componentes MMORPG</h3>
+              <div className="roadmap-features">
+                <span className="roadmap-tag">Resource Nodes</span>
+                <span className="roadmap-tag">Crafting Stations</span>
+                <span className="roadmap-tag">Banks</span>
+                <span className="roadmap-tag">Skills & Equipment</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="roadmap-item">
+            <div className="roadmap-dot current"></div>
+            <div className="roadmap-content">
+              <div className="roadmap-phase">Fase 3 - Atual</div>
+              <h3 className="roadmap-title">Colaboracao em Tempo Real</h3>
+              <div className="roadmap-features">
+                <span className="roadmap-tag">Autenticacao</span>
+                <span className="roadmap-tag">Times & Projetos</span>
+                <span className="roadmap-tag">Edicao Colaborativa</span>
+                <span className="roadmap-tag">Salvamento na Nuvem</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="roadmap-item">
             <div className="roadmap-dot future"></div>
             <div className="roadmap-content">
-              <div className="roadmap-phase">Fase 2</div>
-              <h3 className="roadmap-title">Multiplayer</h3>
+              <div className="roadmap-phase">Fase 4</div>
+              <h3 className="roadmap-title">Multiplayer no Jogo</h3>
               <div className="roadmap-features">
                 <span className="roadmap-tag">WebSocket Server</span>
                 <span className="roadmap-tag">Sincronizacao</span>
@@ -219,7 +317,7 @@ export function Landing() {
           <div className="roadmap-item">
             <div className="roadmap-dot future"></div>
             <div className="roadmap-content">
-              <div className="roadmap-phase">Fase 3</div>
+              <div className="roadmap-phase">Fase 5</div>
               <h3 className="roadmap-title">Terreno e Ambiente</h3>
               <div className="roadmap-features">
                 <span className="roadmap-tag">Editor de Terreno</span>
@@ -229,32 +327,23 @@ export function Landing() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="roadmap-item">
-            <div className="roadmap-dot future"></div>
-            <div className="roadmap-content">
-              <div className="roadmap-phase">Fase 4</div>
-              <h3 className="roadmap-title">Audio e Efeitos</h3>
-              <div className="roadmap-features">
-                <span className="roadmap-tag">Sistema de Audio</span>
-                <span className="roadmap-tag">Particulas</span>
-                <span className="roadmap-tag">Shaders</span>
-                <span className="roadmap-tag">Post-processing</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="roadmap-item">
-            <div className="roadmap-dot future"></div>
-            <div className="roadmap-content">
-              <div className="roadmap-phase">Fase 5</div>
-              <h3 className="roadmap-title">Plataformas</h3>
-              <div className="roadmap-features">
-                <span className="roadmap-tag">Mobile</span>
-                <span className="roadmap-tag">Desktop (Electron)</span>
-                <span className="roadmap-tag">PWA</span>
-              </div>
-            </div>
+      {/* CTA Section */}
+      <section className="cta-section landing-section">
+        <div className="cta-content">
+          <h2 className="cta-title">Pronto para criar seu MMORPG?</h2>
+          <p className="cta-description">
+            Junte-se a comunidade de criadores. Crie sua conta gratuita e comece a construir hoje.
+          </p>
+          <div className="cta-buttons">
+            <Link to="/auth/register" className="btn-primary btn-large">
+              Criar Conta Gratis
+            </Link>
+            <Link to="/blog" className="btn-secondary btn-large">
+              Ver Documentacao
+            </Link>
           </div>
         </div>
       </section>
@@ -327,9 +416,10 @@ export function Landing() {
           <div className="footer-section">
             <h4>Produto</h4>
             <ul className="footer-links">
-              <li><Link to="/editor">Editor</Link></li>
+              <li><Link to="/auth/register">Criar Conta</Link></li>
+              <li><Link to="/auth/login">Entrar</Link></li>
+              <li><Link to="/blog">Features</Link></li>
               <li><Link to="/assets">Assets</Link></li>
-              <li><Link to="/docs">Documentacao</Link></li>
             </ul>
           </div>
 

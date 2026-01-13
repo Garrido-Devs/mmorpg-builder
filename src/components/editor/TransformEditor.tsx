@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import * as THREE from 'three'
+import { getEngine } from '../../engine'
 
 interface TransformEditorProps {
   object: THREE.Object3D
@@ -7,41 +8,61 @@ interface TransformEditorProps {
 
 /**
  * TransformEditor - Editor de posição, rotação e escala
+ *
+ * Usa event-driven approach ao invés de polling para melhor performance
  */
-export function TransformEditor({ object }: TransformEditorProps) {
+export const TransformEditor = memo(function TransformEditor({ object }: TransformEditorProps) {
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 })
   const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 })
   const [scale, setScale] = useState({ x: 1, y: 1, z: 1 })
   const [isCollapsed, setIsCollapsed] = useState(false)
 
-  // Sincroniza com o objeto
+  // Função para atualizar o estado com os valores atuais do objeto
+  const updateFromObject = useCallback(() => {
+    if (!object) return
+
+    setPosition({
+      x: Number(object.position.x.toFixed(2)),
+      y: Number(object.position.y.toFixed(2)),
+      z: Number(object.position.z.toFixed(2)),
+    })
+    setRotation({
+      x: Number(THREE.MathUtils.radToDeg(object.rotation.x).toFixed(1)),
+      y: Number(THREE.MathUtils.radToDeg(object.rotation.y).toFixed(1)),
+      z: Number(THREE.MathUtils.radToDeg(object.rotation.z).toFixed(1)),
+    })
+    setScale({
+      x: Number(object.scale.x.toFixed(2)),
+      y: Number(object.scale.y.toFixed(2)),
+      z: Number(object.scale.z.toFixed(2)),
+    })
+  }, [object])
+
+  // Sincroniza com o objeto via eventos do TransformControls
   useEffect(() => {
     if (!object) return
 
-    const updateTransform = () => {
-      setPosition({
-        x: Number(object.position.x.toFixed(2)),
-        y: Number(object.position.y.toFixed(2)),
-        z: Number(object.position.z.toFixed(2)),
-      })
-      setRotation({
-        x: Number(THREE.MathUtils.radToDeg(object.rotation.x).toFixed(1)),
-        y: Number(THREE.MathUtils.radToDeg(object.rotation.y).toFixed(1)),
-        z: Number(THREE.MathUtils.radToDeg(object.rotation.z).toFixed(1)),
-      })
-      setScale({
-        x: Number(object.scale.x.toFixed(2)),
-        y: Number(object.scale.y.toFixed(2)),
-        z: Number(object.scale.z.toFixed(2)),
-      })
+    // Atualiza imediatamente ao selecionar novo objeto
+    updateFromObject()
+
+    // Obtém TransformControls do engine
+    const engine = getEngine()
+    const controls = engine.editorSystem?.getTransformControls()
+
+    if (!controls) return
+
+    // Handler para o evento 'change' do TransformControls
+    const handleChange = () => {
+      updateFromObject()
     }
 
-    updateTransform()
+    // Escuta eventos de mudança
+    controls.addEventListener('change', handleChange)
 
-    // Atualiza periodicamente enquanto objeto está selecionado (para drag updates)
-    const interval = setInterval(updateTransform, 100)
-    return () => clearInterval(interval)
-  }, [object, object?.uuid])
+    return () => {
+      controls.removeEventListener('change', handleChange)
+    }
+  }, [object, object?.uuid, updateFromObject])
 
   const handlePositionChange = useCallback((axis: 'x' | 'y' | 'z', value: string) => {
     const numValue = parseFloat(value) || 0
@@ -187,4 +208,4 @@ export function TransformEditor({ object }: TransformEditorProps) {
       )}
     </div>
   )
-}
+})

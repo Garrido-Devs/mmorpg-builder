@@ -215,7 +215,7 @@ export function InspectorPanel({ selectedObject }: InspectorPanelProps) {
                     alignItems: 'center',
                     gap: '4px',
                     fontSize: '11px',
-                    color: 'var(--editor-text)',
+                    color: 'var(--editor-text-primary)',
                   }}
                 >
                   <span style={{ fontSize: '24px' }}>
