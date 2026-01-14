@@ -327,6 +327,13 @@ export class Engine {
   }
 
   /**
+   * Verifica se um objeto existe no mapa
+   */
+  public hasObject(id: string): boolean {
+    return this.mapObjects.has(id)
+  }
+
+  /**
    * Remove um objeto do mapa
    */
   public removeObject(id: string, broadcast = true): void {

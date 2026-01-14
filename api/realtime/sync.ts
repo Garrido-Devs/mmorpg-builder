@@ -154,6 +154,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ success: true, action: 'scene-change' })
     }
 
+    // Scene-sync - sincronizar cena completa (quando novo jogador entra)
+    if (action === 'scene-sync') {
+      const { sceneSync } = req.body
+      if (pusher && sceneSync?.objects) {
+        await pusher.trigger(`project-${projectId}`, 'scene-sync', {
+          userId: auth.userId,
+          objects: sceneSync.objects,
+          timestamp: new Date().toISOString(),
+        })
+      }
+
+      return res.status(200).json({ success: true, action: 'scene-sync' })
+    }
+
+    // Request-sync - pedir sincronização da cena
+    if (action === 'request-sync') {
+      if (pusher) {
+        await pusher.trigger(`project-${projectId}`, 'request-sync', {
+          userId: auth.userId,
+        })
+      }
+
+      return res.status(200).json({ success: true, action: 'request-sync' })
+    }
+
     // Update - atualizar posição/seleção
     await sql`
       UPDATE active_sessions

@@ -117,6 +117,13 @@ export function useCollaboration() {
           lastSeen: new Date().toISOString(),
         }
 
+        // Emitir evento para sincronizar cena com novo jogador
+        if (data.userId !== currentUserIdRef.current) {
+          window.dispatchEvent(
+            new CustomEvent('collaboration-user-joined', { detail: { userId: data.userId } })
+          )
+        }
+
         return {
           ...prev,
           activeUsers: [...prev.activeUsers, newUser],
@@ -172,6 +179,34 @@ export function useCollaboration() {
       // Emitir evento customizado para o Editor aplicar a mudança
       window.dispatchEvent(
         new CustomEvent('collaboration-scene-change', { detail: data })
+      )
+    })
+
+    // Evento de sincronização completa da cena (quando alguém entra)
+    channelRef.current.bind('scene-sync', (data: {
+      userId: string
+      objects: unknown[]
+      timestamp: string
+    }) => {
+      // Ignorar se é do próprio usuário
+      if (data.userId === currentUserIdRef.current) return
+
+      console.log('[Collaboration] scene-sync recebido com', data.objects?.length || 0, 'objetos')
+      window.dispatchEvent(
+        new CustomEvent('collaboration-scene-sync', { detail: data })
+      )
+    })
+
+    // Evento de pedido de sincronização (novo jogador pedindo cena)
+    channelRef.current.bind('request-sync', (data: {
+      userId: string
+    }) => {
+      // Ignorar se é do próprio usuário
+      if (data.userId === currentUserIdRef.current) return
+
+      console.log('[Collaboration] request-sync recebido de', data.userId)
+      window.dispatchEvent(
+        new CustomEvent('collaboration-request-sync', { detail: data })
       )
     })
 
@@ -301,6 +336,41 @@ export function useCollaboration() {
     [state.projectId]
   )
 
+  // Broadcast sincronização completa da cena
+  const broadcastSceneSync = useCallback(
+    (objects: unknown[]) => {
+      if (!state.projectId) return
+
+      console.log('[Collaboration] Enviando scene-sync com', objects.length, 'objetos')
+      realtimeApi.sync({
+        projectId: state.projectId,
+        action: 'scene-sync',
+        sceneSync: {
+          objects,
+        },
+      }).catch((err) => {
+        console.error('[Collaboration] Erro ao broadcast scene-sync:', err)
+      })
+    },
+    [state.projectId]
+  )
+
+  // Pedir sincronização da cena (quando entra novo)
+  const requestSceneSync = useCallback(
+    () => {
+      if (!state.projectId) return
+
+      console.log('[Collaboration] Pedindo scene-sync...')
+      realtimeApi.sync({
+        projectId: state.projectId,
+        action: 'request-sync',
+      }).catch((err) => {
+        console.error('[Collaboration] Erro ao request-sync:', err)
+      })
+    },
+    [state.projectId]
+  )
+
   // Sincronizar dados (usado pelo hook useProject)
   const syncData = useCallback(
     async (_type: string, _key: string, _data: unknown, _version?: number): Promise<boolean> => {
@@ -346,5 +416,7 @@ export function useCollaboration() {
     updateSelection,
     syncData,
     broadcastSceneChange,
+    broadcastSceneSync,
+    requestSceneSync,
   }
 }

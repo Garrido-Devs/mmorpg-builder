@@ -132,6 +132,69 @@ export function Editor() {
     return () => window.removeEventListener('collaboration-scene-change', handleRemoteSceneChange as EventListener)
   }, [])
 
+  // Quando outro jogador entra ou pede sync, envia a cena completa
+  useEffect(() => {
+    const sendSceneSync = () => {
+      const engine = getEngine()
+      const mapData = engine.getMapData()
+      console.log('[Editor] Enviando scene-sync com', mapData.objects.length, 'objetos')
+      collaboration.broadcastSceneSync(mapData.objects)
+    }
+
+    const handleUserJoined = () => {
+      // Espera um pouco para o novo usuário estar pronto
+      setTimeout(sendSceneSync, 1000)
+    }
+
+    const handleRequestSync = () => {
+      sendSceneSync()
+    }
+
+    window.addEventListener('collaboration-user-joined', handleUserJoined)
+    window.addEventListener('collaboration-request-sync', handleRequestSync)
+    return () => {
+      window.removeEventListener('collaboration-user-joined', handleUserJoined)
+      window.removeEventListener('collaboration-request-sync', handleRequestSync)
+    }
+  }, [collaboration.broadcastSceneSync])
+
+  // Quando recebe uma sincronização completa da cena
+  useEffect(() => {
+    const handleSceneSync = (event: CustomEvent<{
+      userId: string
+      objects: unknown[]
+    }>) => {
+      const { objects } = event.detail
+      if (!objects || objects.length === 0) return
+
+      console.log('[Editor] Recebendo scene-sync com', objects.length, 'objetos')
+      const engine = getEngine()
+
+      // Adiciona objetos que não existem localmente
+      objects.forEach((objData) => {
+        const data = objData as { id: string }
+        if (!engine.hasObject(data.id)) {
+          console.log('[Editor] Adicionando objeto da sync:', data.id)
+          engine.addObjectFromData(objData as Parameters<typeof engine.addObjectFromData>[0])
+        }
+      })
+    }
+
+    window.addEventListener('collaboration-scene-sync', handleSceneSync as EventListener)
+    return () => window.removeEventListener('collaboration-scene-sync', handleSceneSync as EventListener)
+  }, [])
+
+  // Pede sincronização quando conecta (para receber cena de quem já está)
+  useEffect(() => {
+    if (collaboration.isConnected && collaboration.activeUsers.length > 1) {
+      // Se há outros usuários, pede sync
+      console.log('[Editor] Conectado com outros usuarios, pedindo sync...')
+      setTimeout(() => {
+        collaboration.requestSceneSync()
+      }, 2000)
+    }
+  }, [collaboration.isConnected, collaboration.activeUsers.length, collaboration.requestSceneSync])
+
   // Broadcast local scene changes to collaborators AND save immediately
   useEffect(() => {
     const handleLocalSceneChange = (event: CustomEvent<{
