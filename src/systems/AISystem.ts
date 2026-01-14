@@ -184,7 +184,7 @@ export class AISystem {
    */
   private killNPC(npcId: string): void {
     const managed = this.managedNPCs.get(npcId)
-    if (!managed) return
+    if (!managed || managed.state === 'dead') return // Evita matar duas vezes
 
     this.setState(managed, 'dead')
     managed.object.userData.isDead = true
@@ -193,11 +193,19 @@ export class AISystem {
     if (this.combatSystem) {
       this.combatSystem.unregisterEnemy(npcId)
     }
+    managed.combatant = null
 
     // Notifica callbacks
     this.onNPCDeathCallbacks.forEach(cb => cb(npcId))
 
     console.log(`[AI] ${npcId} morreu!`)
+
+    // Esconde o monstro apos 2 segundos (tempo para animacao de morte)
+    setTimeout(() => {
+      if (managed.object) {
+        managed.object.visible = false
+      }
+    }, 2000)
 
     // Respawn apos 10 segundos
     setTimeout(() => {
@@ -216,11 +224,17 @@ export class AISystem {
     managed.health = managed.maxHealth
     managed.object.userData.isDead = false
 
+    // Torna visivel novamente
+    managed.object.visible = true
+
     // Volta para posicao inicial
     managed.object.position.copy(managed.startPosition)
 
     // Reset estado
     this.setState(managed, 'idle')
+
+    // Atualiza barra de vida
+    this.updateHealthBar(managed)
 
     // Registra novamente no combat system
     if (this.combatSystem && managed.component.attitude === 'hostile') {
@@ -234,6 +248,7 @@ export class AISystem {
         isDead: false,
         takeDamage: (amount: number) => this.damageNPC(npcId, amount),
       }
+      managed.combatant = combatant // guarda referencia
       this.combatSystem.registerEnemy(combatant)
     }
 

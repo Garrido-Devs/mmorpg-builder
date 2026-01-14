@@ -325,11 +325,12 @@ export class CombatSystem implements GameSystem {
       if (enemy.isDead) return
       const dist = enemy.mesh.position.distanceTo(playerPos)
       if (dist <= skill.range) {
-        // Para melee, verifica se esta na frente
+        // Para melee, verifica se esta na frente (arco de 180 graus)
         if (skill.type === 'melee') {
           const toEnemy = enemy.mesh.position.clone().sub(playerPos).normalize()
           const dot = playerDir.dot(toEnemy)
-          if (dot > 0.3) { // Na frente do jogador
+          // dot > -0.2 = arco de ~180 graus (mais generoso)
+          if (dot > -0.2) {
             targets.push(enemy)
           }
         } else {
@@ -347,7 +348,7 @@ export class CombatSystem implements GameSystem {
         if (skill.type === 'melee') {
           const toPlayer = player.mesh.position.clone().sub(playerPos).normalize()
           const dot = playerDir.dot(toPlayer)
-          if (dot > 0.3) {
+          if (dot > -0.2) {
             targets.push(player)
           }
         } else {
