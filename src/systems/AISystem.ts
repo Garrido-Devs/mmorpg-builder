@@ -26,6 +26,11 @@ interface ManagedNPC {
   lastAttackTime: number
   health: number
   maxHealth: number
+  combatant: Combatant | null // referencia para sincronizar HP
+
+  // Health bar
+  healthBar: THREE.Sprite | null
+  healthBarBg: THREE.Sprite | null
 
   // Movement
   startPosition: THREE.Vector3
@@ -101,6 +106,9 @@ export class AISystem {
       lastAttackTime: 0,
       health: 100,
       maxHealth: 100,
+      combatant: null,
+      healthBar: null,
+      healthBarBg: null,
       startPosition: object.position.clone(),
       targetPosition: null,
     }
@@ -125,7 +133,11 @@ export class AISystem {
         isDead: false,
         takeDamage: (amount: number) => this.damageNPC(entityId, amount),
       }
+      managed.combatant = combatant // guarda referencia
       this.combatSystem.registerEnemy(combatant)
+
+      // Cria barra de vida acima do monstro
+      this.createHealthBar(managed)
     }
 
     console.log(`NPC registrado: ${entityId}`)
@@ -144,6 +156,14 @@ export class AISystem {
 
     managed.health -= damage
 
+    // Sincroniza HP com o Combatant registrado no CombatSystem
+    if (managed.combatant) {
+      managed.combatant.health = managed.health
+    }
+
+    // Atualiza barra de vida
+    this.updateHealthBar(managed)
+
     // Som de dano
     AudioManager.playFromGroup('slime')
 
@@ -151,6 +171,10 @@ export class AISystem {
 
     if (managed.health <= 0) {
       managed.health = 0
+      if (managed.combatant) {
+        managed.combatant.health = 0
+        managed.combatant.isDead = true
+      }
       this.killNPC(npcId)
     }
   }
@@ -229,8 +253,11 @@ export class AISystem {
    */
   public unregisterNPC(entityId: string): void {
     const managed = this.managedNPCs.get(entityId)
-    if (managed?.mixer) {
-      managed.mixer.stopAllAction()
+    if (managed) {
+      if (managed.mixer) {
+        managed.mixer.stopAllAction()
+      }
+      this.removeHealthBar(managed)
     }
     this.managedNPCs.delete(entityId)
   }
@@ -261,6 +288,118 @@ export class AISystem {
       }
     } catch (error) {
       console.warn('Falha ao carregar animações do NPC:', error)
+    }
+  }
+
+  /**
+   * Cria barra de vida acima do NPC
+   */
+  private createHealthBar(managed: ManagedNPC): void {
+    // Background (vermelho escuro)
+    const bgCanvas = document.createElement('canvas')
+    bgCanvas.width = 64
+    bgCanvas.height = 8
+    const bgCtx = bgCanvas.getContext('2d')!
+    bgCtx.fillStyle = '#1a1a1a'
+    bgCtx.fillRect(0, 0, 64, 8)
+    bgCtx.strokeStyle = '#333'
+    bgCtx.lineWidth = 1
+    bgCtx.strokeRect(0, 0, 64, 8)
+
+    const bgTexture = new THREE.CanvasTexture(bgCanvas)
+    const bgMaterial = new THREE.SpriteMaterial({ map: bgTexture, transparent: true })
+    const bgSprite = new THREE.Sprite(bgMaterial)
+    bgSprite.scale.set(1.5, 0.15, 1)
+    managed.healthBarBg = bgSprite
+    this.scene.add(bgSprite)
+
+    // Foreground (verde/vermelho baseado no HP)
+    const fgCanvas = document.createElement('canvas')
+    fgCanvas.width = 64
+    fgCanvas.height = 8
+    const fgCtx = fgCanvas.getContext('2d')!
+    fgCtx.fillStyle = '#22c55e'
+    fgCtx.fillRect(0, 0, 64, 8)
+
+    const fgTexture = new THREE.CanvasTexture(fgCanvas)
+    const fgMaterial = new THREE.SpriteMaterial({ map: fgTexture, transparent: true })
+    const fgSprite = new THREE.Sprite(fgMaterial)
+    fgSprite.scale.set(1.5, 0.15, 1)
+    managed.healthBar = fgSprite
+    this.scene.add(fgSprite)
+  }
+
+  /**
+   * Atualiza barra de vida do NPC
+   */
+  private updateHealthBar(managed: ManagedNPC): void {
+    if (!managed.healthBar) return
+
+    const healthPercent = Math.max(0, managed.health / managed.maxHealth)
+
+    // Recria textura com nova cor e tamanho
+    const canvas = document.createElement('canvas')
+    canvas.width = 64
+    canvas.height = 8
+    const ctx = canvas.getContext('2d')!
+
+    // Cor baseada no HP (verde -> amarelo -> vermelho)
+    let color = '#22c55e' // verde
+    if (healthPercent < 0.3) {
+      color = '#ef4444' // vermelho
+    } else if (healthPercent < 0.6) {
+      color = '#f59e0b' // amarelo
+    }
+
+    ctx.fillStyle = color
+    ctx.fillRect(0, 0, 64 * healthPercent, 8)
+
+    // Atualiza textura
+    const material = managed.healthBar.material as THREE.SpriteMaterial
+    if (material.map) {
+      material.map.dispose()
+    }
+    material.map = new THREE.CanvasTexture(canvas)
+    material.needsUpdate = true
+  }
+
+  /**
+   * Atualiza posicao da barra de vida (chamado no update)
+   */
+  private updateHealthBarPosition(managed: ManagedNPC): void {
+    if (!managed.healthBar || !managed.healthBarBg) return
+
+    // Posiciona acima do NPC
+    const pos = managed.object.position.clone()
+    pos.y += 2.5 // altura acima do modelo
+
+    managed.healthBarBg.position.copy(pos)
+    managed.healthBar.position.copy(pos)
+    managed.healthBar.position.z += 0.01 // levemente na frente
+
+    // Esconde se morto
+    const visible = managed.state !== 'dead'
+    managed.healthBar.visible = visible
+    managed.healthBarBg.visible = visible
+  }
+
+  /**
+   * Remove barra de vida
+   */
+  private removeHealthBar(managed: ManagedNPC): void {
+    if (managed.healthBar) {
+      this.scene.remove(managed.healthBar)
+      const material = managed.healthBar.material as THREE.SpriteMaterial
+      material.map?.dispose()
+      material.dispose()
+      managed.healthBar = null
+    }
+    if (managed.healthBarBg) {
+      this.scene.remove(managed.healthBarBg)
+      const material = managed.healthBarBg.material as THREE.SpriteMaterial
+      material.map?.dispose()
+      material.dispose()
+      managed.healthBarBg = null
     }
   }
 
@@ -328,6 +467,9 @@ export class AISystem {
 
       // Atualizar IA
       this.updateNPCBehavior(managed, deltaTime)
+
+      // Atualizar posição da barra de vida
+      this.updateHealthBarPosition(managed)
     })
   }
 
@@ -715,6 +857,7 @@ export class AISystem {
       if (managed.mixer) {
         managed.mixer.stopAllAction()
       }
+      this.removeHealthBar(managed)
     })
     this.managedNPCs.clear()
   }
