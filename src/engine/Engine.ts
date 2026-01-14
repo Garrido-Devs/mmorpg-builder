@@ -97,6 +97,7 @@ export class Engine {
       isDead: this.player.getIsDead(),
       takeDamage: (amount: number) => this.player.takeDamage(amount),
       heal: (amount: number) => this.player.heal(amount),
+      useMana: (amount: number) => this.player.useMana(amount),
     })
 
     // Conecta input de ataque ao combat system

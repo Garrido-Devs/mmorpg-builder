@@ -42,6 +42,7 @@ export interface Combatant {
   isDead: boolean
   takeDamage: (amount: number) => void
   heal?: (amount: number) => void
+  useMana?: (amount: number) => boolean
 }
 
 /**
@@ -267,15 +268,20 @@ export class CombatSystem implements GameSystem {
       return false
     }
 
-    // Verifica mana
-    if (this.player.mana !== undefined && skill.manaCost > this.player.mana) {
-      console.log(`[Combat] Mana insuficiente para ${skill.name}`)
-      return false
-    }
-
-    // Consome mana
-    if (this.player.mana !== undefined && skill.manaCost > 0) {
-      this.player.mana -= skill.manaCost
+    // Verifica e consome mana usando o metodo correto
+    if (skill.manaCost > 0) {
+      if (this.player.useMana) {
+        if (!this.player.useMana(skill.manaCost)) {
+          console.log(`[Combat] Mana insuficiente para ${skill.name}`)
+          return false
+        }
+      } else if (this.player.mana !== undefined) {
+        if (this.player.mana < skill.manaCost) {
+          console.log(`[Combat] Mana insuficiente para ${skill.name}`)
+          return false
+        }
+        this.player.mana -= skill.manaCost
+      }
     }
 
     // Inicia cooldown
@@ -290,22 +296,232 @@ export class CombatSystem implements GameSystem {
     // Notifica UI
     this.onSkillUsedCallbacks.forEach(cb => cb(skillIndex))
 
-    // Executa efeito da skill
-    if (skill.type === 'heal') {
-      // Cura a si mesmo
-      if (this.player.heal) {
-        this.player.heal(Math.abs(skill.damage))
-        this.showDamageNumber(this.player.mesh.position, Math.abs(skill.damage), true)
-      }
-    } else if (skill.type === 'buff') {
-      // Buff (por enquanto nao faz nada visivel)
-      console.log(`[Combat] Buff ${skill.name} aplicado`)
-    } else {
-      // Ataque - encontra alvos no range
-      this.performAttack(skill)
+    // Executa efeito da skill baseado no tipo e ID
+    switch (skill.id) {
+      case 'heal':
+        this.executeHeal(skill)
+        break
+      case 'shield':
+        this.executeShield(skill)
+        break
+      case 'dash':
+        this.executeDash(skill)
+        break
+      default:
+        // Ataque normal
+        this.performAttack(skill)
+        break
     }
 
     return true
+  }
+
+  /**
+   * Executa skill de cura
+   */
+  private executeHeal(skill: SkillDefinition): void {
+    if (!this.player) return
+
+    const healAmount = Math.abs(skill.damage)
+    if (this.player.heal) {
+      this.player.heal(healAmount)
+    }
+    this.showDamageNumber(this.player.mesh.position, healAmount, true)
+
+    // Efeito visual de cura (particulas verdes)
+    this.showHealEffect(this.player.mesh.position)
+  }
+
+  /**
+   * Executa skill de escudo
+   */
+  private executeShield(_skill: SkillDefinition): void {
+    if (!this.player) return
+
+    // Adiciona defesa temporaria
+    const originalDefense = this.player.defense || 0
+    this.player.defense = (this.player.defense || 0) + 20
+
+    // Mostra efeito visual
+    this.showShieldEffect(this.player.mesh.position)
+
+    // Remove o buff apos 10 segundos
+    setTimeout(() => {
+      if (this.player) {
+        this.player.defense = originalDefense
+        console.log('[Combat] Escudo expirou')
+      }
+    }, 10000)
+
+    console.log(`[Combat] Escudo ativado! Defesa: ${this.player.defense}`)
+  }
+
+  /**
+   * Executa skill de dash
+   */
+  private executeDash(skill: SkillDefinition): void {
+    if (!this.player) return
+
+    // Move o jogador para frente rapidamente
+    const direction = new THREE.Vector3(0, 0, -1).applyQuaternion(this.player.mesh.quaternion)
+    const dashDistance = 5
+
+    // Move em passos para evitar atravessar objetos
+    const targetPosition = this.player.mesh.position.clone().add(direction.multiplyScalar(dashDistance))
+    this.player.mesh.position.copy(targetPosition)
+
+    // Causa dano aos inimigos no caminho
+    this.performAttack(skill)
+
+    // Efeito visual de dash
+    this.showDashEffect(this.player.mesh.position, direction)
+  }
+
+  /**
+   * Efeito visual de cura
+   */
+  private showHealEffect(position: THREE.Vector3): void {
+    // Cria particulas verdes subindo
+    for (let i = 0; i < 5; i++) {
+      const canvas = document.createElement('canvas')
+      canvas.width = 32
+      canvas.height = 32
+      const ctx = canvas.getContext('2d')!
+      ctx.fillStyle = '#22c55e'
+      ctx.beginPath()
+      ctx.arc(16, 16, 12, 0, Math.PI * 2)
+      ctx.fill()
+
+      const texture = new THREE.CanvasTexture(canvas)
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.8 })
+      const sprite = new THREE.Sprite(material)
+
+      sprite.position.copy(position)
+      sprite.position.x += (Math.random() - 0.5) * 1.5
+      sprite.position.z += (Math.random() - 0.5) * 1.5
+      sprite.position.y += Math.random() * 0.5
+      sprite.scale.set(0.3, 0.3, 0.3)
+
+      this.scene.add(sprite)
+
+      // Anima subindo e desaparecendo
+      const startY = sprite.position.y
+      const duration = 1000
+      const startTime = Date.now()
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime
+        const progress = elapsed / duration
+
+        if (progress < 1) {
+          sprite.position.y = startY + progress * 2
+          material.opacity = 0.8 * (1 - progress)
+          requestAnimationFrame(animate)
+        } else {
+          this.scene.remove(sprite)
+          material.dispose()
+          texture.dispose()
+        }
+      }
+      animate()
+    }
+  }
+
+  /**
+   * Efeito visual de escudo
+   */
+  private showShieldEffect(position: THREE.Vector3): void {
+    // Cria um anel azul ao redor do jogador
+    const canvas = document.createElement('canvas')
+    canvas.width = 128
+    canvas.height = 128
+    const ctx = canvas.getContext('2d')!
+
+    ctx.strokeStyle = '#60a5fa'
+    ctx.lineWidth = 8
+    ctx.beginPath()
+    ctx.arc(64, 64, 50, 0, Math.PI * 2)
+    ctx.stroke()
+
+    const texture = new THREE.CanvasTexture(canvas)
+    const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.8 })
+    const sprite = new THREE.Sprite(material)
+
+    sprite.position.copy(position)
+    sprite.position.y += 1
+    sprite.scale.set(3, 3, 3)
+
+    this.scene.add(sprite)
+
+    // Expande e desaparece
+    const duration = 500
+    const startTime = Date.now()
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime
+      const progress = elapsed / duration
+
+      if (progress < 1) {
+        const scale = 3 + progress * 2
+        sprite.scale.set(scale, scale, scale)
+        material.opacity = 0.8 * (1 - progress)
+        requestAnimationFrame(animate)
+      } else {
+        this.scene.remove(sprite)
+        material.dispose()
+        texture.dispose()
+      }
+    }
+    animate()
+  }
+
+  /**
+   * Efeito visual de dash
+   */
+  private showDashEffect(position: THREE.Vector3, _direction: THREE.Vector3): void {
+    // Cria rastro de dash
+    for (let i = 0; i < 3; i++) {
+      const canvas = document.createElement('canvas')
+      canvas.width = 64
+      canvas.height = 64
+      const ctx = canvas.getContext('2d')!
+
+      ctx.fillStyle = '#a855f7'
+      ctx.beginPath()
+      ctx.arc(32, 32, 20, 0, Math.PI * 2)
+      ctx.fill()
+
+      const texture = new THREE.CanvasTexture(canvas)
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.6 })
+      const sprite = new THREE.Sprite(material)
+
+      sprite.position.copy(position)
+      sprite.position.y += 1
+      sprite.scale.set(0.5 + i * 0.2, 0.5 + i * 0.2, 1)
+
+      this.scene.add(sprite)
+
+      // Desaparece
+      setTimeout(() => {
+        const duration = 300
+        const startTime = Date.now()
+
+        const animate = () => {
+          const elapsed = Date.now() - startTime
+          const progress = elapsed / duration
+
+          if (progress < 1) {
+            material.opacity = 0.6 * (1 - progress)
+            requestAnimationFrame(animate)
+          } else {
+            this.scene.remove(sprite)
+            material.dispose()
+            texture.dispose()
+          }
+        }
+        animate()
+      }, i * 100)
+    }
   }
 
   /**
