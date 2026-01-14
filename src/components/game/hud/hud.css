@@ -39,6 +39,19 @@
   left: 16px;
 }
 
+/* Ajustes para modo editor (HUD abaixo da toolbar) */
+.game-hud--editor .hud-top-left {
+  top: 60px;
+}
+
+.game-hud--editor .hud-top-center {
+  top: 60px;
+}
+
+.game-hud--editor .hud-top-right {
+  top: 60px;
+}
+
 .hud-top-center {
   position: absolute;
   top: 16px;
